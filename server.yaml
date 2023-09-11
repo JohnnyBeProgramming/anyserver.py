@@ -1,0 +1,13 @@
+# Host configuration
+host: "0.0.0.0"
+port: 9999
+
+# Optional: Define the default route hander as one of the following
+prefer: FastAPI
+static: ./public
+
+#import:
+#  - routes/status.py
+#routes: 
+#  GET:
+#    "^/api/?$": plugins/status.py

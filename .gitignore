@@ -1,0 +1,11 @@
+__pycache__
+public/
+dist/
+temp/
+assets/
+content/
+resources/
+hugo.yaml
+go.*
+*.lock
+*.egg-info

@@ -1,0 +1,49 @@
+# ------------------------------------------------------------
+# This project is powered by: https://taskfile.dev
+# ------------------------------------------------------------
+version: 3
+env: # <-- Project Configuration (required ENV vars)
+  PORT: '{{ .PORT | default "9999" }}'
+  IMAGE: '{{ .IMAGE | default "anyserver/server.py" }}'
+  VERSION: '{{ .VERSION | default "0.0" }}'
+  SERVER_PY: ./dist/server.py
+silent: true # <-- Less verbose
+tasks:
+  # Start web / proxy server
+  start: python3 server.py {{ .CLI_ARGS }}
+
+  # Build the artifacts to be released
+  build:
+    - task: build:merged
+    - task: build:docker
+  build:merged: |-
+    python3 utils/merge.py server.py {{ .SERVER_PY }}
+    chmod +x {{ .SERVER_PY }}
+  build:docker: |-
+    docker build -t "{{ .IMAGE }}:{{ .VERSION }}" .
+
+  # Release and tag the new version
+  publish:
+    - task: publish:tag
+    - task: publish:pip
+
+  publish:tag: |-
+    printf "Current: %s \n" $(git tag --sort=committerdate -l | tail -n 1)
+    printf "Release: " 
+    read tag
+    git tag $tag 
+    git push origin --tags
+
+  publish:pip: |-
+    # Set the latest tag number
+    sed -i.bak 's|^version = .*$|version = '"'$(git tag --sort=committerdate -l | tail -n 1)'"'|' setup.py 
+    rm -f setup.py.bak
+
+    # Create a new release package
+    rm -rf ./dist
+    python3 setup.py sdist
+    pip install twine
+    twine upload dist/* 
+
+  # Clean out all and any untracked data (incl. git changed files)
+  clean: git clean -fdx

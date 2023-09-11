@@ -1,0 +1,11 @@
+# Ignore everything by default
+*
+
+# Only include python source code
+!anyserver/
+!utils/
+!*.py
+!requirements.txt
+
+# Exclude cache files
+**/__pycache__
