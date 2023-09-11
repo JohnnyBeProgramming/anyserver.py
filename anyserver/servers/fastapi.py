@@ -115,7 +115,8 @@ class FastAPIServer(AbstractServer):
 
         # Register all routes with the current flask server
         def decorator(action):
-            from fastapi import Request, Response
+            Request = fastapi.Request
+            Response = fastapi.Response
 
             async def respond(request: Request, response: Response):
                 async def _body():
