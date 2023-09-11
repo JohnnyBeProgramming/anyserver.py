@@ -2,7 +2,7 @@ import subprocess
 from distutils.core import setup
 
 name = 'anyserver'
-version = '0.38'
+version = '0.1'
 
 print(f'SETUP {name} [{version}]')
 setup(
