@@ -4,6 +4,9 @@ from distutils.core import setup
 name = 'anyserver'
 version = '0.1.9-rc8'
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 print(f'SETUP {name} [{version}]')
 setup(
     name=name,
@@ -15,6 +18,8 @@ setup(
     version=version,
     license='MIT',
     description='Simple and generic python web server and utils',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     author='Club404',
     author_email='info@club404.io',
     url='https://github.com/JohnnyBeProgramming/anyserver.py',
