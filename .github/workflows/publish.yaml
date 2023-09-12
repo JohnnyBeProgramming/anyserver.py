@@ -31,8 +31,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-#      - name: Install Taskfile support
-#        uses: arduino/setup-task@v1
-#
-#      - name: Publish python package
-#        run: task publish:pip
+      - name: Install Taskfile support
+        uses: arduino/setup-task@v1
+
+      - name: Publish python package
+        run: task publish:pip
