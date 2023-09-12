@@ -4,6 +4,9 @@ on:
   release:
     types: [published]
 
+permissions:
+  id-token: write
+  
 jobs:
   push_to_registry:
     name: Publish Release
