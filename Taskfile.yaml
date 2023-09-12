@@ -4,7 +4,7 @@
 version: 3
 env: # <-- Project Configuration (required ENV vars)
   PORT: '{{ .PORT | default "9999" }}'
-  IMAGE: '{{ .IMAGE | default "anyserver/server.py" }}'
+  IMAGE: '{{ .IMAGE | default "johnnybeprogramming/anyserver" }}'
   VERSION: '{{ .VERSION | default "0.0" }}'
   SERVER_PY: ./dist/server.py
 silent: true # <-- Less verbose
@@ -34,11 +34,11 @@ tasks:
     git tag $tag 
     git push origin --tags
 
-  publish:pip: |-
     # Set the latest tag number
-    sed -i.bak 's|^version = .*$|version = '"'$(git tag --sort=committerdate -l | tail -n 1)'"'|' setup.py 
+    sed -i.bak 's|^version = .*$|version = '"'$tag'"'|' setup.py 
     rm -f setup.py.bak
 
+  publish:pip: |-
     # Create a new release package
     rm -rf ./dist
     python3 setup.py sdist
