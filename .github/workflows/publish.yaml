@@ -6,7 +6,7 @@ on:
 
 permissions:
   id-token: write
-  
+
 jobs:
   push_to_registry:
     name: Publish Release
@@ -34,15 +34,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Install Taskfile support
-        uses: arduino/setup-task@v1
-
-
       - run: python3 -m pip install --upgrade build && python3 -m build
       - name: Publish package
         uses: pypa/gh-action-pypi-publish@release/v1
-      #  with:
-      #    password: ${{ secrets.PYPI_API_TOKEN }}
-
-      #- name: Publish python package
-      #  run: task publish:pip
