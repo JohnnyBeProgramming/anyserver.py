@@ -141,6 +141,9 @@ class FlaskServer(AbstractServer):
     def static(self, path):
         self.config.static = path
 
+        if not os.path.isdir(path):
+            return # Static path does not exist
+
         # Bind the static content to flask's router
         @self.app.route('/', defaults={'path': 'index.html'})
         @self.app.route('/<path:path>')
