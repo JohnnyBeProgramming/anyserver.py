@@ -4,7 +4,7 @@
 version: 3
 env: # <-- Project Configuration (required ENV vars)
   PORT: '{{ .PORT | default "9999" }}'
-  IMAGE: '{{ .IMAGE | default "johnnybeprogramming/anyserver" }}'
+  IMAGE: '{{ .IMAGE | default "johnnybedockered/anyserver" }}'
   VERSION: '{{ .VERSION | default "0.0" }}'
   SERVER_PY: ./dist/server.py
 silent: true # <-- Less verbose
