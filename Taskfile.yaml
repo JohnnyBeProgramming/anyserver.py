@@ -4,7 +4,7 @@
 version: 3
 env: # <-- Project Configuration (required ENV vars)
   PORT: '{{ .PORT | default "9999" }}'
-  IMAGE: '{{ .IMAGE | default "johnnybedockered/anyserver" }}'
+  IMAGE: '{{ .IMAGE | default "johnnybeprogramming/anyserver" }}'
   VERSION: '{{ .VERSION | default "0.0" }}'
   SERVER_PY: ./dist/server.py
 silent: true # <-- Less verbose
@@ -37,11 +37,12 @@ tasks:
     rm -f setup.py.bak
     git add setup.py
     git commit -m 'Bumping version'
+    git push
     
 
     # Tag the new release and push top remote server
     git tag $tag 
-    git push --follow-tags
+    git push origin --tags
     
 
   publish:pip: |-
