@@ -10,7 +10,8 @@ flask = OptionalModule('flask', [
     'Response',
     'request',
     'redirect',
-    'render_template'
+    'render_template',
+    'send_from_directory'
 ])
 
 
@@ -142,7 +143,7 @@ class FlaskServer(AbstractServer):
         self.config.static = path
 
         if not os.path.isdir(path):
-            return # Static path does not exist
+            return  # Static path does not exist
 
         # Bind the static content to flask's router
         @self.app.route('/', defaults={'path': 'index.html'})
