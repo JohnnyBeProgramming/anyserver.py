@@ -31,12 +31,17 @@ tasks:
     printf "Current: %s \n" $(git tag --sort=committerdate -l | tail -n 1)
     printf "Release: " 
     read tag
-    git tag $tag 
-    git push origin --tags
 
     # Set the latest tag number
-    sed -i.bak 's|^version = .*$|version = '"'$tag'"'|' setup.py 
+    sed -i.bak 's|^version = .*$|version = '"'$tag'"'|' setup.py
     rm -f setup.py.bak
+    git add setup.py
+    git commit -m 'Bumping version'
+
+    # Tag the new release and push top remote server
+    git tag $tag 
+    git push origin --tags
+    
 
   publish:pip: |-
     # Create a new release package

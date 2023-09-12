@@ -13,4 +13,4 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build the Docker image
-        run: docker build --tag anyserver/server.py:$(date +%s) .
+        run: docker build --tag johnnybeprogramming/anyserver:$(date +%s) .
