@@ -37,10 +37,11 @@ tasks:
     rm -f setup.py.bak
     git add setup.py
     git commit -m 'Bumping version'
+    
 
     # Tag the new release and push top remote server
     git tag $tag 
-    git push origin --tags
+    git push --follow-tags
     
 
   publish:pip: |-
