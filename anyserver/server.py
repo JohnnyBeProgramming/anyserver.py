@@ -27,8 +27,4 @@ def AnyServer(app=None, config=None, prefers=None, prefix=''):
     if not server:
         server = SimpleServer(prefix, config, app)
 
-    if server:
-        # Display a banner when the server starts up
-        DEBUG.show_banner(server.__class__.__name__)
-
     return server

@@ -54,7 +54,6 @@ class WebRouter:
                 route = self.prefix + sub_path
                 action = routes[verb][sub_path]
                 http[verb][route] = action
-                DEBUG.add_route(verb, route)                
 
     def _routes(self):
         # Get the parse list of routes that are registered

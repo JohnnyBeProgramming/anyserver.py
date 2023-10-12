@@ -12,6 +12,7 @@ router = TemplateRouter('/test', base=f'{THIS_DIR}/templates')
 @router.renders('test/index')
 def GetStatus(req, resp):
     return {
+        "verb": req.verb,
         "status": "online",
     }
 

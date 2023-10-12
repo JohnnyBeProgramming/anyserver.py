@@ -112,8 +112,6 @@ class FlaskServer(AbstractServer):
         self.app.run(debug=debug, host=self.config.host, port=self.config.port)
 
     def route(self, verb, route):
-        DEBUG.add_route(verb, route)
-
         # Register all routes with the current flask server
         def decorator(action):
             def respond(*args, **kwargs):

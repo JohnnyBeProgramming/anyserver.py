@@ -109,9 +109,7 @@ class FastAPIServer(AbstractServer):
         self.config.static = path  # Will be loaded on start
 
     def route(self, verb, route):
-        DEBUG.add_route(verb, route)
-
-        # Register all routes with the current flask server
+        # Register all routes with the current FastAPI server
 
         def decorator(action):
             Request = fastapi.Request

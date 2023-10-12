@@ -51,7 +51,7 @@ class C:
     @staticmethod
     def warning(msg):
         return f'{C.YELLOW}{msg}'
-    
+
     @staticmethod
     def error(msg):
         return f'{C.RED}{msg}'
@@ -62,6 +62,20 @@ class C:
 
 
 class DEBUG:
+
+    @staticmethod
+    def server_start(server):
+        # Display a banner when the server starts up
+        DEBUG.show_banner(server.__class__.__name__)
+
+        # List all the registered routes
+        if server.routes:
+            for route, verbs in server.routes.items():
+                for verb in verbs:
+                    DEBUG.add_route(verb, route)
+
+        # Print server header with config details
+        DEBUG.print_config(server.config)
 
     @staticmethod
     def show_banner(server_type='DEFAULT'):
@@ -136,6 +150,7 @@ class DEBUG:
     @staticmethod
     def req_start(req):
         print(C.dim(" « request: "), C.bright(C.BOLD + 'STARTED'))
+
     def req_end(req):
         print(C.dim(" « request: "), C.success(C.BOLD + 'FINISH'))
         print(C.dim(" « request: "), C.error(C.BOLD + 'FAILED'))

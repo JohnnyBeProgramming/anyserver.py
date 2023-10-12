@@ -11,6 +11,7 @@ from anyserver.templates import TemplateRouter
 class AbstractServer(TemplateRouter):
     app = None
     config = None
+    routes = {}
 
     def __init__(self, prefix='', config=None, app=None):
         config = config if config else GetConfig()
@@ -34,6 +35,11 @@ class AbstractServer(TemplateRouter):
                 action = routes[verb][sub_path]
                 self.route(verb, route)(action)
 
+                # Track the action for this path and verb (for later use)
+                actions = self.routes
+                actions[route] = actions[route] if route in actions else {}
+                actions[route][verb] = action
+
     def route(self, verb, route):
         raise Exception('Not implemented: BaseServer.route(verb, route)')
 
@@ -43,8 +49,9 @@ class AbstractServer(TemplateRouter):
     def onStart(self):
         signal.signal(signal.SIGINT, self.onExit)
 
-        # Print server header with config details
-        DEBUG.print_config(self.config)
+        # Show the banner and header info for the current server
+        DEBUG.server_start(self)
+        
 
     def onExit(self, signum, frame): return exit(1)
 

@@ -24,13 +24,13 @@ class Request(WebRequest):
         path_parts = ctx.path.split('?')
         if len(path_parts) > 1:
             return parse.parse_qs(path_parts[1])
-        return {}    
+        return {}
 
     def body(self, ctx, headers):
         # Only try and parse the body for known methods (eg: POST, PUT)
         if not ctx.command in ["POST", "PUT", "PATCH"]:
-            return None 
-        
+            return None
+
         # Parse the body according to the content type
         ctype = headers['content-type'] if 'content-type' in headers else ''
         length = int(ctx.headers.get('content-length'))
@@ -146,7 +146,6 @@ class SimpleServer(AbstractServer):
         self.config.static = path
 
     def route(self, verb, route):
-        DEBUG.add_route(verb, route)
 
         def decorator(action):
             # Register this rout, to be searched and resolved in SimpleServer.reply(verb, path, ctx)
