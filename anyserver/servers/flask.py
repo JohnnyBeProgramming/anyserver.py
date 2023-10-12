@@ -114,6 +114,7 @@ class FlaskServer(AbstractServer):
     def route(self, verb, route):
         # Register all routes with the current flask server
         def decorator(action):
+            # Define the response handler
             def respond(*args, **kwargs):
 
                 req = FlaskServer.Request(flask.request)
@@ -132,8 +133,8 @@ class FlaskServer(AbstractServer):
 
             # Register the route handler with flask's internal route handling
             # eg: @self.app.route(route, methods=[verb])(respond)
-            self.app.add_url_rule(
-                route, route, view_func=respond, methods=[verb])
+            view_id = f'[{verb}]{route}'
+            self.app.add_url_rule(route, view_id, view_func=respond, methods=[verb])
 
             return action
         return decorator

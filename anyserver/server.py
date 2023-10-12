@@ -6,6 +6,7 @@ from anyserver.servers.flask import tryFlaskServer
 SERVER_TYPES = {
     "FastAPI": tryFastAPIServer,
     "Flask": tryFlaskServer,
+    "Default": SimpleServer,
 }
 
 

@@ -11,7 +11,7 @@ from anyserver.templates import TemplateRouter
 class AbstractServer(TemplateRouter):
     app = None
     config = None
-    routes = {}
+    _registered = {}
 
     def __init__(self, prefix='', config=None, app=None):
         config = config if config else GetConfig()
@@ -26,17 +26,35 @@ class AbstractServer(TemplateRouter):
         # Get the raw list of routes, eg: routes[VERB][path] = func(req, resp)
         routes = router._routes() if isinstance(router, WebRouter) else router
 
+        def tracer(verb, path, action):
+            if not self.config.debug:
+                return action
+            
+            # Define a simple function that can help us trace through requests
+            def wrapped(*args, **kwargs):
+                try:
+                    DEBUG.req_start(verb, path, action)
+                    data = action(*args, **kwargs)
+                    DEBUG.req_end(verb, path, data)
+                except Exception as ex:
+                    DEBUG.req_fail(verb, path, ex)
+                    raise ex
+                return data
+            return wrapped
+
         # Update our internal routes
         for verb in routes:
             # Create verb entry if not exist
             for sub_path in routes[verb]:
                 # Register the route in this we
-                route = self.prefix + sub_path
+                prefix = self.prefix or ''
+                route = prefix + sub_path
                 action = routes[verb][sub_path]
+                action = tracer(verb, route, action)
                 self.route(verb, route)(action)
 
                 # Track the action for this path and verb (for later use)
-                actions = self.routes
+                actions = self._registered
                 actions[route] = actions[route] if route in actions else {}
                 actions[route][verb] = action
 
@@ -51,12 +69,11 @@ class AbstractServer(TemplateRouter):
 
         # Show the banner and header info for the current server
         DEBUG.server_start(self)
-        
 
     def onExit(self, signum, frame): return exit(1)
 
     def discover(self, path="./routes"):
-        DEBUG.printIf(' - Auto discovering routes in: %s', path)
+        DEBUG.printIf('Auto discovering routes in: %s', path)
 
 
 class OptionalModule:

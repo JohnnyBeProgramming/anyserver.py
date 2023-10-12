@@ -69,8 +69,8 @@ class DEBUG:
         DEBUG.show_banner(server.__class__.__name__)
 
         # List all the registered routes
-        if server.routes:
-            for route, verbs in server.routes.items():
+        if routes := server._registered:
+            for route, verbs in routes.items():
                 for verb in verbs:
                     DEBUG.add_route(verb, route)
 
@@ -148,9 +148,11 @@ class DEBUG:
               C.dim(" # <-- Accepts: "), C.dim(accepts))
 
     @staticmethod
-    def req_start(req):
-        print(C.dim(" « request: "), C.bright(C.BOLD + 'STARTED'))
+    def req_start(verb, path, req):
+        print(C.dim(" « request: "), C.bright(C.BOLD + 'STARTED') + C.RESET)
 
-    def req_end(req):
-        print(C.dim(" « request: "), C.success(C.BOLD + 'FINISH'))
-        print(C.dim(" « request: "), C.error(C.BOLD + 'FAILED'))
+    def req_end(verb, path, data):
+        print(C.dim(" « request: "), C.success(C.BOLD + 'FINISH') + C.RESET)
+
+    def req_fail(verb, path, error):
+        print(C.dim(" « request: "), C.error(C.BOLD + 'FAILED') + C.RESET)
