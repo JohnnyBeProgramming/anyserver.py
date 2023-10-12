@@ -1,5 +1,6 @@
 import logging
 import os
+from anyserver.debug import DEBUG
 
 from anyserver.router import WebRequest, WebResponse
 from anyserver.servers.abstract import AbstractServer, OptionalModule
@@ -96,9 +97,7 @@ class FastAPIServer(AbstractServer):
         debug = self.config.debug
         imports = self.config.reloads
         if debug and not imports:
-            logging.warn('WARNING: Live reload mode has been disabled.')
-            logging.warn(' - To use live reload, speficy the app entrypoint.')
-            logging.warn('   eg: config["reloads"] = "main:app.app"')
+            DEBUG.warn_no_reload()            
             debug = False
 
         host = self.config.host
@@ -107,13 +106,13 @@ class FastAPIServer(AbstractServer):
         uvicorn.run(handle, host=host, port=port, reload=debug)
 
     def static(self, path):
-        self.config.static = path # Will be loaded on start
+        self.config.static = path  # Will be loaded on start
 
     def route(self, verb, route):
-        print(' + [ %-5s ] %s' % (verb, route))
-
+        DEBUG.add_route(verb, route)
 
         # Register all routes with the current flask server
+
         def decorator(action):
             Request = fastapi.Request
             Response = fastapi.Response

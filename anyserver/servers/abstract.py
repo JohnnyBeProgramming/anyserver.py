@@ -3,7 +3,7 @@ import signal
 from importlib import import_module
 
 from anyserver import GetConfig
-from anyserver.config import PrintConfig
+from anyserver.debug import DEBUG
 from anyserver.router import WebRouter
 from anyserver.templates import TemplateRouter
 
@@ -44,12 +44,12 @@ class AbstractServer(TemplateRouter):
         signal.signal(signal.SIGINT, self.onExit)
 
         # Print server header with config details
-        PrintConfig(self.config)
+        DEBUG.print_config(self.config)
 
     def onExit(self, signum, frame): return exit(1)
 
     def discover(self, path="./routes"):
-        print(' - Auto discovering routes in: %s' % path)
+        DEBUG.printIf(' - Auto discovering routes in: %s', path)
 
 
 class OptionalModule:

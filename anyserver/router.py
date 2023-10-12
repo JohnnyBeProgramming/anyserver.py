@@ -3,6 +3,8 @@ import json
 
 from urllib.request import urlopen, Request
 
+from anyserver.debug import DEBUG
+
 
 class Serializable:
     def toJSON(self):
@@ -52,7 +54,7 @@ class WebRouter:
                 route = self.prefix + sub_path
                 action = routes[verb][sub_path]
                 http[verb][route] = action
-                print(' + [ %-5s ] %s' % (verb, route))
+                DEBUG.add_route(verb, route)                
 
     def _routes(self):
         # Get the parse list of routes that are registered

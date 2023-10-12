@@ -1,0 +1,31 @@
+
+# -------------------------------------------------------------------------
+# See: https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+# -------------------------------------------------------------------------
+@target-url=http://127.0.0.1:9999
+
+# -------------------------------------------------------------------------
+### Blind check of 'target-url'
+# -------------------------------------------------------------------------
+curl {{target-url}}/
+
+### GET the test route
+curl {{target-url}}/test
+
+### Get HTMX version
+POST {{target-url}}/test
+Hx-Request: true
+accpet: text/html
+
+### Get HTMX version
+GET {{target-url}}/test
+Hx-Request: true
+accpet: "text/html,application/json"
+
+### Get as YAML contents
+GET {{target-url}}/test
+accept: application/yaml
+
+### Get as CSV content
+GET {{target-url}}/test
+accept: text/csv

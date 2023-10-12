@@ -4,6 +4,7 @@ from urllib import parse
 from functools import partial
 
 from http.server import HTTPServer, SimpleHTTPRequestHandler
+from anyserver.debug import DEBUG
 
 from anyserver.router import WebRequest, WebResponse
 from anyserver.servers.abstract import AbstractServer
@@ -145,7 +146,7 @@ class SimpleServer(AbstractServer):
         self.config.static = path
 
     def route(self, verb, route):
-        print(' + [ %-5s ] %s' % (verb, route))
+        DEBUG.add_route(verb, route)
 
         def decorator(action):
             # Register this rout, to be searched and resolved in SimpleServer.reply(verb, path, ctx)

@@ -4,6 +4,7 @@ import importlib
 
 from glob import glob
 
+from anyserver.debug import DEBUG
 from anyserver.router import WebRouter
 from anyserver.encoder import Encoder
 
@@ -95,14 +96,20 @@ class TemplateRouter(WebRouter):
                 resp.head['content-type'] = ctype
 
             # If the result is already a string, we skip, and assume its already encoded
-            if data and type(data) == str:
+            if type(data) == str:
                 return data
 
+            # Try and resolve a template to apply (given the accepted content types)
+            accept = req.head['accept'] if 'accept' in req.head else ''
             filename = self.find_view(path, ctype)
-            if not filename:
-                # No template, render current encoding from content type
+            if filename:
+                # Template has been found and will be applied
+                DEBUG.template_found(path, ctype, filename, accept)
+            elif not filename:
+                # No template, render encoding for content type
                 ctype = self.default_enc if not ctype else ctype
                 resp.head['content-type'] = ctype
+                DEBUG.default_encoding(ctype, accept)
                 return self.encode(data, ctype)
 
             # Template found, lets render it (incl. request and response objects)
@@ -138,8 +145,6 @@ class TemplateRouter(WebRouter):
             found = self.load_view(path, ctype)
             if found:
                 views[path][ctype] = found
-                logger.debug(' + LOAD[%s] (ctype: %s) <=- %s' %
-                             (path, ctype, found))
 
     def load_view(self, path, ctype):
         # Check if template for content type is cached
@@ -172,8 +177,8 @@ class TemplateRouter(WebRouter):
         return found
 
     def find_view(self, path, ctype=None):
-        logger.debug(' ? FIND[%s] (ctype: %s)' % (path, ctype))
         views = self.views
+        available = []
 
         # If no content type specified, we will search for available response types
         if path in views and not ctype and len(list(views[path].keys())):
@@ -187,8 +192,6 @@ class TemplateRouter(WebRouter):
 
         # Get the render template by path and content type
         if path in views and ctype in views[path]:
-            logger.debug(' - GETS[%s] (ctype: %s) - %s' %
-                         (path, ctype, views[path][ctype]))
             return views[path][ctype]
 
         # No render engine found for content type

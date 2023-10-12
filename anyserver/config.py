@@ -121,16 +121,3 @@ def ApplyArgs(config, args):
             setattr(config, key, val)
     return config
 
-
-def printIf(message, value=None):
-    if value:
-        print(message % value)
-
-
-def PrintConfig(config):
-    print('-' * 64)
-    printIf(' + Work Dir: %s', config.working)
-    printIf(' + WWW Root: %s', config.static)
-    printIf(' ~ Proxy To: %s', config.proxy)
-    print(' - Hostname: http://%s:%s' % (config.host, config.port))
-    print('-' * 64)

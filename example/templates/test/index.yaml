@@ -1,0 +1,4 @@
+# Custom YAML template
+app:
+    name: test
+    status: {{status}}

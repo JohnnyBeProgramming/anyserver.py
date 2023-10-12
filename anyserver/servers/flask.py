@@ -1,5 +1,6 @@
 import os
 import logging
+from anyserver.debug import DEBUG
 
 from anyserver.router import WebRequest, WebResponse
 from anyserver.servers.abstract import AbstractServer, OptionalModule
@@ -111,7 +112,7 @@ class FlaskServer(AbstractServer):
         self.app.run(debug=debug, host=self.config.host, port=self.config.port)
 
     def route(self, verb, route):
-        print(' + [ %-5s ] %s' % (verb, route))
+        DEBUG.add_route(verb, route)
 
         # Register all routes with the current flask server
         def decorator(action):

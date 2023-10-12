@@ -11,11 +11,6 @@ app.register(STATUS_ROUTES)
 app.register(TODO_ROUTES)
 
 
-@app.get("/ping")  # <-- Example route registration
-def ping(req, resp):
-    return {"ping": "pong"}
-
-
 def main():    
     app.start()
 

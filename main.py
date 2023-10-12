@@ -3,7 +3,7 @@ from anyserver import AnyServer
 
 from example.routes.status import router as STATUS_ROUTES
 from example.routes.todo.index import router as TODO_ROUTES
-from example.routes.task import router as TASK_ROUTES
+from example.test import router as TEST_ROUTES
 
 app = AnyServer(prefers='FastAPI')
 
@@ -11,7 +11,8 @@ app = AnyServer(prefers='FastAPI')
 def main():
     app.static("./public")
     app.register(STATUS_ROUTES)
-    app.register(TODO_ROUTES)
+    app.register(TEST_ROUTES)
+    #app.register(TODO_ROUTES)
     app.start()
 
 

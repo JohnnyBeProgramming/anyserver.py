@@ -1,3 +1,4 @@
+from anyserver.debug import DEBUG
 from anyserver.servers.simple import SimpleServer
 from anyserver.servers.fastapi import tryFastAPIServer
 from anyserver.servers.flask import tryFlaskServer
@@ -27,8 +28,7 @@ def AnyServer(app=None, config=None, prefers=None, prefix=''):
         server = SimpleServer(prefix, config, app)
 
     if server:
-        print('=' * 64)
-        print(f'Starting {server.__class__.__name__}...')
-        print('=' * 64)
+        # Display a banner when the server starts up
+        DEBUG.show_banner(server.__class__.__name__)
 
     return server
