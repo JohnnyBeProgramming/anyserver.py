@@ -16,10 +16,10 @@ CSV = CsvEncoder()
 
 # Register common encoders
 Encoder.register(
-    TEXT,
     HTML,
+    TEXT,
+    JSON,
     CSV,
-    JSON
 )
 
 # -----------------------------------------------------------------

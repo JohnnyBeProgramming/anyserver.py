@@ -1,19 +1,21 @@
+from abc import ABC, abstractmethod
+from typing import Optional
+
 REGISTERED = []
 
 
-class Encoder:
+class Encoder(ABC):
     mime = None
     ext = []
 
-    def encode(self, data):
-        raise Exception('Not implemented: Encoder.encode()')
+    @abstractmethod
+    def encode(self, data): ...
 
-    def decode(self, data):
-        raise Exception('Not implemented: Encoder.decode()')
+    @abstractmethod
+    def decode(self, data): ...
 
     @staticmethod
-    def all():
-        return REGISTERED  # Return all registered
+    def all(): return REGISTERED  # Return all registered
 
     @staticmethod
     def register(*encoders):

@@ -200,7 +200,7 @@ class TemplateRouter(WebRouter):
         # No render engine found for content type
         return None
 
-    def encode(self, data, ctype=None):
+    def encode(self, data, ctype=None):        
         # Fall back to default content type for encoding
         ctype = self.default_enc if not ctype else ctype
 

@@ -1,6 +1,6 @@
 from anyserver.config import GetConfig
 from anyserver.router import WebRouter
-from anyserver.encoder import Encoder, CsvEncoder, HtmlEncoder, JsonEncoder, TextEncoder, YamlEncoder
+from anyserver.encoder import Encoder, CsvEncoder, JsonEncoder, TextEncoder, YamlEncoder
 
 from anyserver.server import AnyServer
 from anyserver.servers.abstract import AbstractServer

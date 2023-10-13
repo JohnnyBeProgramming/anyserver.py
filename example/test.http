@@ -10,7 +10,7 @@
 curl {{target-url}}/
 
 ### GET the test route
-curl {{target-url}}/api
+curl {{target-url}}/test
 
 ### Get HTMX version
 POST {{target-url}}/test
@@ -28,7 +28,7 @@ hx-trigger-name: main
 GET {{target-url}}/test
 hx-request: true
 hx-trigger-name: main
-accpet: "text/html,application/json"
+accpet: application/json
 
 ### Get as YAML contents
 GET {{target-url}}/test
