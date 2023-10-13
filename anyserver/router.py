@@ -3,6 +3,9 @@ import json
 
 from urllib.request import urlopen, Request
 
+from anyserver.config import Environment
+from anyserver.debug import TRACER
+
 
 class Serializable:
     def toJSON(self):
@@ -30,30 +33,34 @@ class WebResponse(Serializable):
 class WebRouter:
 
     def __init__(self, prefix='', routes=None):
-        self.prefix = prefix
+        self.prefix = prefix or ''
         self.routes = routes if routes else {}
 
     def register(self, router):
-        routes = router  # If directly imported
-
-        # Check if routes were registered into a router
-        if isinstance(router, WebRouter):
-            # Web router was used to register routes
-            routes = router._routes()
+        # Get the raw list of routes, eg: routes[VERB][path] = func(req, resp)
+        routes = router.all_routes() if isinstance(router, WebRouter) else router
 
         # Update our internal routes
-        http = self.routes
         for verb in routes:
             # Create verb entry if not exist
-            if not verb in http:
-                http[verb] = {}
             for sub_path in routes[verb]:
                 # Register the route in this we
-                route = self.prefix + sub_path
+                prefix = self.prefix or ''
+                route = prefix + sub_path
                 action = routes[verb][sub_path]
-                http[verb][route] = action
+                if Environment.IS_DEV:
+                    action = self.tracer(verb, route, action)
+                self.route(verb, route)(action)
 
-    def _routes(self):
+    def route(self, verb, route):
+        def decorator(action):
+            http = self.routes
+            http[verb] = {} if not verb in http else http[verb]
+            http[verb][route] = action
+            return action
+        return decorator
+
+    def all_routes(self):
         # Get the parse list of routes that are registered
         http = {}
         prefix = self.prefix if self.prefix != '/' else ''
@@ -88,17 +95,6 @@ class WebRouter:
         message += "Verb: %s, Path: %s\n" % (verb, path)
         raise Exception('FATAL: %s' % message)
 
-    def route(self, verb, path):
-        routes = self.routes
-        if not verb in routes:
-            routes[verb] = {}
-
-        def decorator(action):
-            routes[verb][path] = action
-            return action
-
-        return decorator
-
     def head(self, path):
         return self.route("HEAD", path)
 
@@ -116,6 +112,18 @@ class WebRouter:
 
     def delete(self, path):
         return self.route("DELETE", path)
+
+    def tracer(self, verb, path, action):
+        # Define a simple function that can help us trace through requests in DEV mode
+        def wrapped(*args, **kwargs):
+            try:
+                TRACER.req_start(verb, path, *args, **kwargs)
+                data = action(*args, **kwargs)
+            except Exception as ex:
+                TRACER.req_fail(verb, path, ex)
+                raise ex
+            return data
+        return wrapped
 
     def proxy(self, url, req):
         if not url:

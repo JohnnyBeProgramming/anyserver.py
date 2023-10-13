@@ -73,10 +73,15 @@ class TRACER:
         TRACER.show_banner(server.__class__.__name__)
 
         # List all the registered routes
-        if routes := server._registered:
-            for route, verbs in routes.items():
-                for verb in verbs:
-                    TRACER.add_route(verb, route)
+        # Track the action for this path and verb (for later use)
+        routes = {}
+        for verb, registered in server.all_routes().items():
+            for route in registered:
+                routes[route] = routes[route] if route in routes else {}
+                routes[route][verb] = registered[route]
+        for route, verbs in routes.items():
+            for verb in verbs:
+                TRACER.add_route(verb, route)
 
         # Print server header with config details
         TRACER.print_config(server.config)

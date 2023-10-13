@@ -112,33 +112,38 @@ class FlaskServer(AbstractServer):
         os.environ['FLASK_ENV'] = "development" if debug else "production"
         self.app.run(debug=debug, host=self.config.host, port=self.config.port)
 
-    def route(self, verb, route):
-        # Register all routes with the current flask server
-        def decorator(action):
-            # Define the response handler
-            def respond(*args, **kwargs):
+    def bind(self, verb, route, action):
 
-                req = FlaskServer.Request(flask.request)
-                resp = FlaskServer.Response(flask.Response(status=200), req)
+        # Service the incomming request with the specified handler
+        def template(path, data):
+            return flask.render_template(path, **data)
 
-                # Service the incomming request with the specified handler
-                def template(path, data):
-                    return flask.render_template(path, **data)
+        # Define the response handler
+        def respond(*args, **kwargs):
 
-                # Prepare the response and format the result
-                response = resp.ctx
-                response.data = self.render(action)(req, resp, render=template)
-                for head in resp.head.keys():
-                    response.headers[head] = resp.head[head]
-                return response
+            req = FlaskServer.Request(flask.request)
+            resp = FlaskServer.Response(flask.Response(status=200), req)
 
-            # Register the route handler with flask's internal route handling
-            # eg: @self.app.route(route, methods=[verb])(respond)
-            view_id = f'[{verb}]{route}'
-            self.app.add_url_rule(route, view_id, view_func=respond, methods=[verb])
+            # Prepare the response and format the result
+            response = resp.ctx
+            response.data = self.render(action)(req, resp, render=template)
 
-            return action
-        return decorator
+            # Add response headers to the result
+            for head in resp.head.keys():
+                response.headers[head] = resp.head[head]
+
+            # Return the result to the requestor
+            return response
+
+        # Register the route handler with flask's internal route handling
+        # eg: @self.app.route(route, methods=[verb])(respond)
+        view_id = f'[{verb}]{route}'
+        self.app.add_url_rule(
+            route,
+            view_id,
+            view_func=respond,
+            methods=[verb]
+        )
 
     def static(self, path):
         self.config.static = path

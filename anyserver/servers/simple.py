@@ -144,16 +144,9 @@ class SimpleServer(AbstractServer):
         # Set the static folder (will be set when server starts)
         self.config.static = path
 
-    def route(self, verb, route):
-
-        def decorator(action):
-            # Register this rout, to be searched and resolved in SimpleServer.reply(verb, path, ctx)
-            http = self.routes
-            http[verb] = {} if not verb in http else http[verb]
-            http[verb][route] = action
-            return action
-
-        return decorator
+    def bind(self, verb, route, action):
+        # No additonal steps required, route already cached
+        pass
 
     def reply(self, verb, path, ctx):
         # This method is called from the `Handler` interface, each time a route is intercepted

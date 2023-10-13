@@ -80,6 +80,7 @@ class FastAPIServer(AbstractServer):
                 self._resp.data = body
 
     def __init__(self, prefix='', config=None, app=None):
+        # Create a router to register incomming events with
         self.app = app if app else fastapi.FastAPI()
         super().__init__(prefix, config, self.app)
 
@@ -96,7 +97,7 @@ class FastAPIServer(AbstractServer):
         debug = self.config.debug
         imports = self.config.reloads
         if debug and not imports:
-            TRACER.warn_no_reload()            
+            TRACER.warn_no_reload()
             debug = False
 
         host = self.config.host
@@ -107,48 +108,43 @@ class FastAPIServer(AbstractServer):
     def static(self, path):
         self.config.static = path  # Will be loaded on start
 
-    def route(self, verb, route):
+    def bind(self, verb, route, action):
         # Register all routes with the current FastAPI server
+        Request = fastapi.Request
+        Response = fastapi.Response
 
-        def decorator(action):
-            Request = fastapi.Request
-            Response = fastapi.Response
+        async def respond(request: Request, response: Response):
+            async def _body():
+                if not request.method in ["POST", "PUT", "PATCH"]:
+                    return None
 
-            async def respond(request: Request, response: Response):
-                async def _body():
-                    if not request.method in ["POST", "PUT", "PATCH"]:
-                        return None
+                # Parse the body according to the content type
+                ctype = request.headers['content-type'] if 'content-type' in request.headers else None
+                match ctype:
+                    case 'application/json':
+                        return await request.json()
+                    case 'application/x-www-form-urlencoded':
+                        return await request.form()
 
-                    # Parse the body according to the content type
-                    ctype = request.headers['content-type'] if 'content-type' in request.headers else None
-                    match ctype:
-                        case 'application/json':
-                            return await request.json()
-                        case 'application/x-www-form-urlencoded':
-                            return await request.form()
+                return await request.body()
 
-                    return await request.body()
+            # Service the incomming request with the specified handler
+            req = FastAPIServer.Request(request)
+            req.body = await _body()  # Fetch the body (async)
+            resp = FastAPIServer.Response(response, request)
 
-                # Service the incomming request with the specified handler
-                # def template(path, data): return render_template(path, **data)
-                req = FastAPIServer.Request(request)
-                req.body = await _body()  # Fetch the body (async)
-                resp = FastAPIServer.Response(response, request)
+            # Call the template handler
+            data = self.render(action)(req, resp)
 
-                data = self.render(action)(req, resp)
+            # Return text if already encoded as string
+            if type(data) == str:
                 ctype = None if not 'content-type' in resp.head else resp.head['content-type']
-                if type(data) == str:
-                    return fastapi.Response(content=data, media_type=ctype)
+                return fastapi.Response(content=data, media_type=ctype)
 
-                return data
+            return data
 
-            # Register the route handler with flask's internal route handling
-            # eg: @app.<VERB>(<ROUTE>)
-            app = self.app
-            router = fastapi.APIRouter()
-            router.add_api_route(route, respond, methods=[verb])
-            app.include_router(router)
-
-            return action
-
-        return decorator
+        # Register the route handler with flask's internal route handling
+        # eg: @app.<VERB>(<ROUTE>)
+        router = fastapi.APIRouter()
+        router.add_api_route(route, respond, methods=[verb])
+        self.app.include_router(router)

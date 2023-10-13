@@ -12,7 +12,6 @@ from anyserver.templates import TemplateRouter
 class AbstractServer(TemplateRouter):
     app = None
     config = None
-    _registered = {}
 
     def __init__(self, prefix='', config=None, app=None):
         config = config if config else GetConfig()
@@ -20,47 +19,25 @@ class AbstractServer(TemplateRouter):
         self.config = config
         self.app = app
 
-    def start(self):
-        raise Exception('Not implemented: BaseServer.start()')
-
-    def register(self, router):
-        # Get the raw list of routes, eg: routes[VERB][path] = func(req, resp)
-        routes = router._routes() if isinstance(router, WebRouter) else router
-
-        def tracer(verb, path, action):
-            # Define a simple function that can help us trace through requests
-            def wrapped(*args, **kwargs):
-                try:
-                    TRACER.req_start(verb, path, *args, **kwargs)
-                    data = action(*args, **kwargs)
-                except Exception as ex:
-                    TRACER.req_fail(verb, path, ex)
-                    raise ex
-                return data
-            return wrapped
-
-        # Update our internal routes
-        for verb in routes:
-            # Create verb entry if not exist
-            for sub_path in routes[verb]:
-                # Register the route in this we
-                prefix = self.prefix or ''
-                route = prefix + sub_path
-                action = routes[verb][sub_path]
-                if Environment.IS_DEV:
-                    action = tracer(verb, route, action)
-                self.route(verb, route)(action)
-
-                # Track the action for this path and verb (for later use)
-                actions = self._registered
-                actions[route] = actions[route] if route in actions else {}
-                actions[route][verb] = action
-
     def route(self, verb, route):
-        raise Exception('Not implemented: BaseServer.route(verb, route)')
+        register = super().route(verb, route)
+
+        def decorator(action):
+            # Let the server implementation bind the route
+            self.bind(verb, route, action)
+            # Register the route in the route cache
+            register(action)
+            return action
+        return decorator
+
+    def bind(self, verb, route, action):
+        raise Exception('Not implemented: AbstractServer.bind()')
+
+    def start(self):
+        raise Exception('Not implemented: AbstractServer.start()')
 
     def static(self, path):
-        raise Exception('Not implemented: BaseServer.static(path)')
+        raise Exception('Not implemented: AbstractServer.static(path)')
 
     def onStart(self):
         signal.signal(signal.SIGINT, self.onExit)
