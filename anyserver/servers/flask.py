@@ -123,10 +123,11 @@ class FlaskServer(AbstractServer):
 
             req = FlaskServer.Request(flask.request)
             resp = FlaskServer.Response(flask.Response(status=200), req)
+            data = self.render(action)(req, resp, render=template)
 
-            # Prepare the response and format the result
+            # Prepare the response
             response = resp.ctx
-            response.data = self.render(action)(req, resp, render=template)
+            response.data = data
 
             # Add response headers to the result
             for head in resp.head.keys():

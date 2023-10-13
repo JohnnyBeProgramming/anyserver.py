@@ -1,3 +1,4 @@
+from abc import ABC
 import re
 import json
 
@@ -30,7 +31,7 @@ class WebResponse(Serializable):
         self.body = body
 
 
-class WebRouter:
+class WebRouter(ABC):
 
     def __init__(self, prefix='', routes=None):
         self.prefix = prefix or ''

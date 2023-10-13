@@ -114,23 +114,10 @@ class FastAPIServer(AbstractServer):
         Response = fastapi.Response
 
         async def respond(request: Request, response: Response):
-            async def _body():
-                if not request.method in ["POST", "PUT", "PATCH"]:
-                    return None
-
-                # Parse the body according to the content type
-                ctype = request.headers['content-type'] if 'content-type' in request.headers else None
-                match ctype:
-                    case 'application/json':
-                        return await request.json()
-                    case 'application/x-www-form-urlencoded':
-                        return await request.form()
-
-                return await request.body()
 
             # Service the incomming request with the specified handler
             req = FastAPIServer.Request(request)
-            req.body = await _body()  # Fetch the body (async)
+            req.body = await self._body(request)  # Fetch the body (async)
             resp = FastAPIServer.Response(response, request)
 
             # Call the template handler
@@ -148,3 +135,17 @@ class FastAPIServer(AbstractServer):
         router = fastapi.APIRouter()
         router.add_api_route(route, respond, methods=[verb])
         self.app.include_router(router)
+
+    async def _body(self, request: Request):
+        if not request.method in ["POST", "PUT", "PATCH"]:
+            return None
+
+        # Parse the body according to the content type
+        ctype = request.headers['content-type'] if 'content-type' in request.headers else None
+        match ctype:
+            case 'application/json':
+                return await request.json()
+            case 'application/x-www-form-urlencoded':
+                return await request.form()
+
+        return await request.body()
