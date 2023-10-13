@@ -65,21 +65,21 @@ class C:
         return C.RESET + C.UNDERLINE + C.BLUE + msg + C.RESET
 
 
-class DEBUG:
+class TRACER:
 
     @staticmethod
     def server_start(server):
         # Display a banner when the server starts up
-        DEBUG.show_banner(server.__class__.__name__)
+        TRACER.show_banner(server.__class__.__name__)
 
         # List all the registered routes
         if routes := server._registered:
             for route, verbs in routes.items():
                 for verb in verbs:
-                    DEBUG.add_route(verb, route)
+                    TRACER.add_route(verb, route)
 
         # Print server header with config details
-        DEBUG.print_config(server.config)
+        TRACER.print_config(server.config)
 
     @staticmethod
     def show_banner(server_type='DEFAULT'):
@@ -102,7 +102,7 @@ class DEBUG:
 
     @staticmethod
     def print_config(config):
-        printIf = DEBUG.printIf
+        printIf = TRACER.printIf
         print(C.DIM + '-' * 64 + C.RESET)
 
         printIf(' + Work Dir: %s', config.working)
@@ -127,14 +127,14 @@ class DEBUG:
     @staticmethod
     def default_encoded(ctype, accept=''):
         # This method is called when the result was encoded for response
-        DEBUG.req_end(**{
+        TRACER.req_end(**{
             "encode": ctype,
         })
 
     @staticmethod
     def template_found(filename, accept=''):
         # This method is called when the result was rendered in a template
-        DEBUG.req_end(**{
+        TRACER.req_end(**{
             "render": filename,
         })
 
@@ -155,9 +155,9 @@ class DEBUG:
         print(f'{C.DIM}--» [ {fVerb} {fPath} ] {fTail}')
 
         if 'hx-request' in req.head:
-            DEBUG.print_htmx_headers(req)
+            TRACER.print_htmx_headers(req)
         if req.body:
-            DEBUG.req_body(req)
+            TRACER.req_body(req)
 
     @staticmethod
     def req_end(**kwargs):
@@ -214,4 +214,4 @@ class DEBUG:
             if key.startswith("hx-") and key != 'hx-request':
                 head[key] = req.head[key]
         if head:
-            DEBUG.req_head(req, head)
+            TRACER.req_head(req, head)

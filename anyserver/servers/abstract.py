@@ -4,7 +4,7 @@ from importlib import import_module
 
 from anyserver import GetConfig
 from anyserver.config import Environment
-from anyserver.debug import DEBUG
+from anyserver.debug import TRACER
 from anyserver.router import WebRouter
 from anyserver.templates import TemplateRouter
 
@@ -31,10 +31,10 @@ class AbstractServer(TemplateRouter):
             # Define a simple function that can help us trace through requests
             def wrapped(*args, **kwargs):
                 try:
-                    DEBUG.req_start(verb, path, *args, **kwargs)
+                    TRACER.req_start(verb, path, *args, **kwargs)
                     data = action(*args, **kwargs)
                 except Exception as ex:
-                    DEBUG.req_fail(verb, path, ex)
+                    TRACER.req_fail(verb, path, ex)
                     raise ex
                 return data
             return wrapped
@@ -66,12 +66,12 @@ class AbstractServer(TemplateRouter):
         signal.signal(signal.SIGINT, self.onExit)
 
         # Show the banner and header info for the current server
-        DEBUG.server_start(self)
+        TRACER.server_start(self)
 
     def onExit(self, signum, frame): return exit(1)
 
     def discover(self, path="./routes"):
-        DEBUG.printIf('Auto discovering routes in: %s', path)
+        TRACER.printIf('Auto discovering routes in: %s', path)
 
 
 class OptionalModule:

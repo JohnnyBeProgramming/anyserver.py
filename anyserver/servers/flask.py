@@ -1,6 +1,5 @@
 import os
 import logging
-from anyserver.debug import DEBUG
 
 from anyserver.router import WebRequest, WebResponse
 from anyserver.servers.abstract import AbstractServer, OptionalModule

@@ -1,7 +1,6 @@
-import logging
 import os
-from anyserver.debug import DEBUG
 
+from anyserver.debug import TRACER
 from anyserver.router import WebRequest, WebResponse
 from anyserver.servers.abstract import AbstractServer, OptionalModule
 
@@ -97,7 +96,7 @@ class FastAPIServer(AbstractServer):
         debug = self.config.debug
         imports = self.config.reloads
         if debug and not imports:
-            DEBUG.warn_no_reload()            
+            TRACER.warn_no_reload()            
             debug = False
 
         host = self.config.host

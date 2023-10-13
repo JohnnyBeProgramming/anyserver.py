@@ -4,7 +4,7 @@ import importlib
 
 from glob import glob
 
-from anyserver.debug import DEBUG
+from anyserver.debug import TRACER
 from anyserver.router import WebRouter
 from anyserver.encoder import Encoder
 
@@ -107,12 +107,12 @@ class TemplateRouter(WebRouter):
             filename = self.find_view(path, ctype)
             if filename:
                 # Template has been found and will be applied
-                DEBUG.template_found(filename, accept)
+                TRACER.template_found(filename, accept)
             else:
                 # No template, render encoding for content type
                 ctype = self.default_enc if not ctype else ctype
                 resp.head['content-type'] = ctype
-                DEBUG.default_encoded(ctype, accept)
+                TRACER.default_encoded(ctype, accept)
                 return self.encode(data, ctype)
 
             # Template found, lets render it (incl. request and response objects)

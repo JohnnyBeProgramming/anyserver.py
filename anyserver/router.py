@@ -3,8 +3,6 @@ import json
 
 from urllib.request import urlopen, Request
 
-from anyserver.debug import DEBUG
-
 
 class Serializable:
     def toJSON(self):

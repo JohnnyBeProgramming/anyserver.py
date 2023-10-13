@@ -4,7 +4,6 @@ from urllib import parse
 from functools import partial
 
 from http.server import HTTPServer, SimpleHTTPRequestHandler
-from anyserver.debug import DEBUG
 
 from anyserver.router import WebRequest, WebResponse
 from anyserver.servers.abstract import AbstractServer

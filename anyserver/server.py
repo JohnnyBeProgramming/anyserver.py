@@ -1,4 +1,3 @@
-from anyserver.debug import DEBUG
 from anyserver.servers.simple import SimpleServer
 from anyserver.servers.fastapi import tryFastAPIServer
 from anyserver.servers.flask import tryFlaskServer
