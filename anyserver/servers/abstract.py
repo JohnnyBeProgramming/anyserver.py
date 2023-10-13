@@ -3,6 +3,7 @@ import signal
 from importlib import import_module
 
 from anyserver import GetConfig
+from anyserver.config import Environment
 from anyserver.debug import DEBUG
 from anyserver.router import WebRouter
 from anyserver.templates import TemplateRouter
@@ -27,15 +28,11 @@ class AbstractServer(TemplateRouter):
         routes = router._routes() if isinstance(router, WebRouter) else router
 
         def tracer(verb, path, action):
-            if not self.config.debug:
-                return action
-            
             # Define a simple function that can help us trace through requests
             def wrapped(*args, **kwargs):
                 try:
-                    DEBUG.req_start(verb, path, action)
+                    DEBUG.req_start(verb, path, *args, **kwargs)
                     data = action(*args, **kwargs)
-                    DEBUG.req_end(verb, path, data)
                 except Exception as ex:
                     DEBUG.req_fail(verb, path, ex)
                     raise ex
@@ -50,7 +47,8 @@ class AbstractServer(TemplateRouter):
                 prefix = self.prefix or ''
                 route = prefix + sub_path
                 action = routes[verb][sub_path]
-                action = tracer(verb, route, action)
+                if Environment.IS_DEV:
+                    action = tracer(verb, route, action)
                 self.route(verb, route)(action)
 
                 # Track the action for this path and verb (for later use)

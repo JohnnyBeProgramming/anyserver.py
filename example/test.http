@@ -10,16 +10,24 @@
 curl {{target-url}}/
 
 ### GET the test route
-curl {{target-url}}/test
+curl {{target-url}}/api
 
 ### Get HTMX version
 POST {{target-url}}/test
-Hx-Request: true
 accpet: text/html
+content-type: application/json
+hx-request: true
+hx-trigger-name: main
+
+{
+    "task": "build"
+}
+
 
 ### Get HTMX version
 GET {{target-url}}/test
-Hx-Request: true
+hx-request: true
+hx-trigger-name: main
 accpet: "text/html,application/json"
 
 ### Get as YAML contents
@@ -28,4 +36,4 @@ accept: application/yaml
 
 ### Get as CSV content
 GET {{target-url}}/test
-accept: text/csv
+accept: text/csv,application/json

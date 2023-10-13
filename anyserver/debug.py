@@ -3,6 +3,10 @@ import logging
 import os
 import sys
 
+import yaml
+
+from anyserver.config import Environment
+
 
 def supports_color():
     """
@@ -121,38 +125,93 @@ class DEBUG:
         logging.warn(C.dim(message))
 
     @staticmethod
-    def default_encoding(ctype, accept=''):
-        # Trim extra long headers
-        max = 48
-        accepts = accept[:max] + '...' if len(accept) > max else accept
-        accepts = accepts or '*'
-        if ctype and ctype in accepts:
-            ctype_b = C.RESET + C.success(ctype) + C.RESET + C.DIM
-            accepts = C.dim(accepts.replace(ctype, ctype_b))
-
-        print(C.dim(" « encodes: "), C.bright(ctype),
-              C.dim(" # <-- Accepts: "), C.dim(accepts))
+    def default_encoded(ctype, accept=''):
+        # This method is called when the result was encoded for response
+        DEBUG.req_end(**{
+            "encode": ctype,
+        })
 
     @staticmethod
-    def template_found(path, ctype, found, accept=''):
-
-        # List all the accepted ctypes
-        max = 48
-        accepts = accept[:max] + '...' if len(accept) > max else accept
-        accepts = accepts or '*'
-        if ctype and ctype in accepts:
-            ctype_b = C.RESET + C.bright(ctype) + C.RESET + C.DIM
-            accepts = C.dim(accepts.replace(ctype, ctype_b))
-
-        print(C.dim(" « renders: "), C.bright(C.BOLD + found),
-              C.dim(" # <-- Accepts: "), C.dim(accepts))
+    def template_found(filename, accept=''):
+        # This method is called when the result was rendered in a template
+        DEBUG.req_end(**{
+            "render": filename,
+        })
 
     @staticmethod
-    def req_start(verb, path, req):
-        print(C.dim(" « request: "), C.bright(C.BOLD + 'STARTED') + C.RESET)
+    def req_start(verb, path, *args, **kwargs):
+        if not Environment.IS_DEV:
+            return
+        # Try and resolve the request object from the incoming args
+        req = args[0] if len(args) > 0 else None
+        req = req if req or not "req" in kwargs else kwargs["req"]
+        if not req:
+            return False
 
-    def req_end(verb, path, data):
-        print(C.dim(" « request: "), C.success(C.BOLD + 'FINISH') + C.RESET)
+        # Print a header for the incomming request
+        fVerb = f'{C.RESET}{C.BOLD}{req.verb}{C.RESET}{C.DIM}'
+        fPath = f'{C.RESET}{C.BOLD}{req.path}{C.RESET}{C.DIM}'
+        fTail = '-'*(64 - 9 - len(req.verb) - len(req.path))
+        print(f'{C.DIM}--» [ {fVerb} {fPath} ] {fTail}')
 
+        if 'hx-request' in req.head:
+            DEBUG.print_htmx_headers(req)
+        if req.body:
+            DEBUG.req_body(req)
+
+    @staticmethod
+    def req_end(**kwargs):
+        if not Environment.IS_DEV:
+            return
+        label = 'DONE' if not "status" in kwargs else kwargs["status"]
+        prefix = C.dim("«-- [ ")
+        status = C.success(C.BOLD + label)
+        suffix = C.dim(' ] ')
+        sep = '« ' if len(kwargs.keys()) else ''
+        length = 64-9-len(label)
+        extra = ''
+        for key, val in (kwargs or {}).items():
+            if key and key.strip():
+                extra += sep + f'{key}: {C.bright(val) + C.RESET + C.DIM}'
+                length -= 2 + len(key) + len(val) + len(sep)
+                sep = ', '
+        fill = C.dim(extra + ' ' + ('-'*length)) + C.RESET
+        print(f'{prefix}{status}{suffix}{fill}')
+
+    @staticmethod
     def req_fail(verb, path, error):
-        print(C.dim(" « request: "), C.error(C.BOLD + 'FAILED') + C.RESET)
+        label = 'FAILED'
+        message = str(error) if error else ""
+        message = message.split("\n")[0]
+        prefix = C.dim("«-- [ ")
+        status = C.error(C.BOLD + label)
+        hint = C.RESET + C.error(C.BOLD + message) + C.RESET + C.DIM
+        length = 64-9-len(label) - len(message)
+        suffix = C.dim(f' ] {hint} '+'-' * length) + C.RESET
+        print(f'{prefix}{status}{suffix}')
+
+    @staticmethod
+    def req_head(req, head=None):
+        if not head:
+            head = {}
+            for k in filter(lambda k: k, req.head):
+                head[k] = req.head[k]
+        print(yaml.safe_dump({"head": head}).rstrip())
+
+    @staticmethod
+    def req_body(req):
+        if req.body and not type(req.body) in [str, bytes]:
+            body = {}
+            for k in req.body.keys():
+                body[k] = req.body[k]
+            print(yaml.safe_dump({"body": body}).rstrip())
+
+    @staticmethod
+    def print_htmx_headers(req):
+        head = {}
+        for key in req.head.keys():
+            key = key.lower()
+            if key.startswith("hx-") and key != 'hx-request':
+                head[key] = req.head[key]
+        if head:
+            DEBUG.req_head(req, head)

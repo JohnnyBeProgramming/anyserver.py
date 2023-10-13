@@ -7,6 +7,10 @@ import argparse
 from anyserver.encoder import Encoder
 
 
+class Environment:
+    IS_DEV = False
+
+
 class ServerConfig:
     # Host configuration
     host = '0.0.0.0'
@@ -109,8 +113,10 @@ def GetArgs(argv=sys.argv[1:]):
 
     # Set the log verbosity
     format = '%(message)s'
-    loglevel = logging.DEBUG if args.debug else args.loglevel
-    logging.basicConfig(format=format, level=loglevel)
+    args.loglevel = logging.DEBUG if args.debug else args.loglevel
+    logging.basicConfig(format=format, level=args.loglevel)
+
+    Environment.IS_DEV = args.debug
 
     return args
 

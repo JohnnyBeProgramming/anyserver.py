@@ -11,7 +11,7 @@ app.config.reloads = "main:app.app"
 app.static("./public")
 app.register(STATUS_ROUTES)
 app.register(TEST_ROUTES)
-app.register(TODO_ROUTES)
+#app.register(TODO_ROUTES)
 
 
 def main():

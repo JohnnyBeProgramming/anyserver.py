@@ -85,8 +85,11 @@ class TemplateRouter(WebRouter):
                 "response": resp,
                 **data
             }
+        
+        ref = action
 
         def formatted(req, resp, render=None, *args, **kwargs):
+
             # Get the raw result from the action
             data = action(req, resp, *args, **kwargs)
 
@@ -95,8 +98,8 @@ class TemplateRouter(WebRouter):
             if ctype:  # Set the response content type (if not already set)
                 resp.head['content-type'] = ctype
 
-            # If the result is already a string, we skip, and assume its already encoded
-            if type(data) == str:
+            # If the result is already a string or bytes, we skip, and assume its already encoded
+            if type(data) == str or type(data) == bytes:
                 return data
 
             # Try and resolve a template to apply (given the accepted content types)
@@ -104,12 +107,12 @@ class TemplateRouter(WebRouter):
             filename = self.find_view(path, ctype)
             if filename:
                 # Template has been found and will be applied
-                DEBUG.template_found(path, ctype, filename, accept)
-            elif not filename:
+                DEBUG.template_found(filename, accept)
+            else:
                 # No template, render encoding for content type
                 ctype = self.default_enc if not ctype else ctype
                 resp.head['content-type'] = ctype
-                DEBUG.default_encoding(ctype, accept)
+                DEBUG.default_encoded(ctype, accept)
                 return self.encode(data, ctype)
 
             # Template found, lets render it (incl. request and response objects)

@@ -106,9 +106,11 @@ class FlaskServer(AbstractServer):
         super().__init__(prefix, config, app)
 
     def start(self):
+        self.onStart()
+
         # Start the server using the target (request handler) type
         debug = self.config.loglevel == logging.DEBUG
-        self.onStart()
+        os.environ['FLASK_ENV'] = "development" if debug else "production"
         self.app.run(debug=debug, host=self.config.host, port=self.config.port)
 
     def route(self, verb, route):
