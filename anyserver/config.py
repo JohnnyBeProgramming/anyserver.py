@@ -27,7 +27,7 @@ class ServerConfig:
 
     debug = False
     discover = True
-    reloads = None
+    entrypoint = None
     routes = {}
 
 

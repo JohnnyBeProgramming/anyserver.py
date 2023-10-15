@@ -7,7 +7,6 @@ from example.test import router as TEST_ROUTES
 
 # Declare the server instance and register all the routes
 app = AnyServer(prefers='FastAPI')
-app.config.reloads = "main:app.app"
 app.static("./public")
 app.register(STATUS_ROUTES)
 app.register(TEST_ROUTES)

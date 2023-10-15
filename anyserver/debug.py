@@ -124,7 +124,7 @@ class TRACER:
         title = 'WARNING: Live reload mode has been disabled.'
         message = """
 - To use live reload, speficy the app entrypoint.
-  eg: config["reloads"] = "main:app.app"
+  eg: config.entrypoint = "main:app.app"
 """
         logging.warn(C.warning(title) + C.RESET)
         logging.warn(C.dim(message))

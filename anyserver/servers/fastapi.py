@@ -1,8 +1,10 @@
 import os
+import sys
 
 from anyserver.debug import TRACER
 from anyserver.router import WebRequest, WebResponse
 from anyserver.servers.abstract import AbstractServer, OptionalModule
+from anyserver.utils.entrypoint import Entrypoint
 
 # Bootstrap the flask module (if available amd installed as a dependency)
 uvicorn = OptionalModule('uvicorn', ['run'])
@@ -84,25 +86,33 @@ class FastAPIServer(AbstractServer):
         self.app = app if app else fastapi.FastAPI()
         super().__init__(prefix, config, self.app)
 
+        # Auto detect the entrypoint if in development mode
+        if self.config.debug and not self.config.entrypoint:
+            root = Entrypoint.get()
+            self.config.entrypoint = f'{root}.app' if root else None
+
     def start(self):
         self.onStart()
 
-        # Mount the static path afetr all routes were registered
+        # Required properties
+        host = self.config.host
+        port = self.config.port
         static = self.config.static
+
+        # Check if we are running in dev or debug mode
+        debug = self.config.debug
+        entrypoint = self.config.entrypoint
+        if debug and not entrypoint:
+            TRACER.warn_no_reload()
+            debug = False
+
+        # Mount the static path afetr all routes were registered
         if static and os.path.isdir(static):
             fileserver = fastapiStatic.StaticFiles(directory=static, html=True)
             self.app.mount("/", fileserver, name="static")
 
         # Start the server using the target (request handler) type
-        debug = self.config.debug
-        imports = self.config.reloads
-        if debug and not imports:
-            TRACER.warn_no_reload()
-            debug = False
-
-        host = self.config.host
-        port = self.config.port
-        handle = self.app if not imports else imports
+        handle = self.app if not entrypoint else entrypoint
         uvicorn.run(handle, host=host, port=port, reload=debug)
 
     def static(self, path):
