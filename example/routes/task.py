@@ -4,6 +4,7 @@ import json
 import subprocess
 
 from anyserver import WebRouter
+from anyserver.utils.tracer import trace
 
 # Define a router that we can load some routes into
 router = WebRouter(prefix='/task')
@@ -21,7 +22,7 @@ def RunCommand(cmd, env=os.environ.copy()):
         return None
 
     pop = cmd.split(" ")
-    print(' > Executes: %s' % cmd)
+    trace(' > Executes: %s' % cmd)
     res = subprocess.run(pop, stdout=subprocess.PIPE, env=env)
     output = res.stdout.decode().strip()
 

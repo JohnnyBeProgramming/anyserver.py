@@ -5,7 +5,7 @@ import json
 from urllib.request import urlopen, Request
 
 from anyserver.config import ServerConfig
-from anyserver.utils.tracer import TRACER
+from anyserver.utils.tracer import TRACER, trace
 
 
 class Serializable:
@@ -132,7 +132,7 @@ class WebRouter(ABC):
             raise Exception("FATAL: No proxy URL has been set up.")
 
         url = '{}{}'.format(url, req.path)
-        print(' ~ Proxy me: %s' % url)
+        trace(' ~ Proxy me: %s' % url)
 
         # Populate the new request with the headers that was requested from client
         headers = {}

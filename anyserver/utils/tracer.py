@@ -8,6 +8,15 @@ import yaml
 from anyserver.config import ServerConfig
 
 
+def trace(msg): logging.info(msg)
+
+
+def traceIf(msg, value):
+    if value:
+        output = f'{msg} {C.bright(value)}'
+        trace(C.DIM + output + C.RESET)
+
+
 def supports_color():
     """
     Returns True if the running system's terminal supports color, and False
@@ -22,6 +31,7 @@ def supports_color():
 
 
 HAS_COLOR = os.getenv('TERM') and supports_color()
+
 
 class C:
 
@@ -88,35 +98,29 @@ class TRACER:
     @staticmethod
     def show_banner(server_type='DEFAULT'):
         title = C.bright(C.UNDERLINE + C.BOLD+server_type)
-        print(C.DIM + '=' * 64 + C.RESET)
-        print(C.WHITE + f'Starting {title}...')
-        print(C.DIM + '=' * 64 + C.RESET)
+        trace(C.DIM + '=' * 64 + C.RESET)
+        trace(C.WHITE + f'Starting {title}...')
+        trace(C.DIM + '=' * 64 + C.RESET)
 
     @staticmethod
     def add_route(verb, route):
         verb = C.bright(C.BOLD + verb.ljust(6, ' ')) + C.DIM
         route = C.bright(route) + C.DIM
-        print(C.DIM + f' + [ {verb} ] {route}' + C.RESET)
-
-    @staticmethod
-    def printIf(message, value=None):
-        if value:
-            output = message % C.bright(value)
-            print(C.DIM + output + C.RESET)
+        trace(C.DIM + f' + [ {verb} ] {route}' + C.RESET)
 
     @staticmethod
     def print_config(config):
-        printIf = TRACER.printIf
-        print(C.DIM + '-' * 64 + C.RESET)
+        trace(C.DIM + '-' * 64 + C.RESET)
 
-        printIf(' + Work Dir: %s', config.working)
-        printIf(' + Web Root: %s', config.static)
-        printIf(' ~ Proxy To: %s', config.proxy)
+        traceIf(' + Dev Mode:', config.development)
+        traceIf(' + Work Dir:', config.working)
+        traceIf(' + Web Root:', config.static)
+        traceIf(' ~ Proxy To:', config.proxy)
 
         hostname = 'http://%s:%s' % (config.host, config.port)
         hostname = C.hyperlink(hostname)
-        print(C.DIM + ' - Hostname: ' + hostname)
-        print(C.DIM + '-' * 64 + C.RESET)
+        trace(C.DIM + ' - Hostname: ' + hostname)
+        trace(C.DIM + '-' * 64 + C.RESET)
 
     @staticmethod
     def warn_no_reload():
@@ -156,7 +160,7 @@ class TRACER:
         fVerb = f'{C.RESET}{C.BOLD}{req.verb}{C.RESET}{C.DIM}'
         fPath = f'{C.RESET}{C.BOLD}{req.path}{C.RESET}{C.DIM}'
         fTail = '-'*(64 - 9 - len(req.verb) - len(req.path))
-        print(f'{C.DIM}--» [ {fVerb} {fPath} ] {fTail}')
+        trace(f'{C.DIM}--» [ {fVerb} {fPath} ] {fTail}')
 
         if 'hx-request' in req.head:
             TRACER.print_htmx_headers(req)
@@ -180,7 +184,7 @@ class TRACER:
                 length -= 2 + len(key) + len(val) + len(sep)
                 sep = ', '
         fill = C.dim(extra + ' ' + ('-'*length)) + C.RESET
-        print(f'{prefix}{status}{suffix}{fill}')
+        trace(f'{prefix}{status}{suffix}{fill}')
 
     @staticmethod
     def req_fail(verb, path, error):
@@ -194,7 +198,7 @@ class TRACER:
         hint = C.RESET + C.error(C.BOLD + message) + C.RESET + C.DIM
         length = 64-9-len(label) - len(message)
         suffix = C.dim(f' ] {hint} '+'-' * length) + C.RESET
-        print(f'{prefix}{status}{suffix}')
+        trace(f'{prefix}{status}{suffix}')
 
     @staticmethod
     def req_head(req, head=None):
@@ -202,7 +206,8 @@ class TRACER:
             head = {}
             for k in filter(lambda k: k, req.head):
                 head[k] = req.head[k]
-        print(yaml.safe_dump({"head": head}).rstrip())
+        output = yaml.safe_dump({"head": head})
+        trace(output.rstrip())
 
     @staticmethod
     def req_body(req):
@@ -210,7 +215,8 @@ class TRACER:
             body = {}
             for k in req.body.keys():
                 body[k] = req.body[k]
-            print(yaml.safe_dump({"body": body}).rstrip())
+            output = yaml.safe_dump({"body": body})
+            trace(output.rstrip())
 
     @staticmethod
     def print_htmx_headers(req):
