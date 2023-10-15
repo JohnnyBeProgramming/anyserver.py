@@ -1,3 +1,6 @@
+
+import anyserver.domain
+
 from anyserver.config import GetConfig
 from anyserver.router import WebRouter
 from anyserver.encoder import Encoder, CsvEncoder, JsonEncoder, TextEncoder, YamlEncoder

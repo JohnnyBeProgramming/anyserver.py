@@ -1,7 +1,7 @@
 import os
 import sys
 
-from anyserver.debug import TRACER
+from anyserver.utils.tracer import TRACER
 from anyserver.router import WebRequest, WebResponse
 from anyserver.servers.abstract import AbstractServer, OptionalModule
 from anyserver.utils.entrypoint import Entrypoint
@@ -87,7 +87,8 @@ class FastAPIServer(AbstractServer):
         super().__init__(prefix, config, self.app)
 
         # Auto detect the entrypoint if in development mode
-        if self.config.debug and not self.config.entrypoint:
+        # This needs to be called in the constructor for it to work
+        if self.config.is_dev and not self.config.entrypoint:
             root = Entrypoint.get()
             self.config.entrypoint = f'{root}.app' if root else None
 
@@ -100,11 +101,11 @@ class FastAPIServer(AbstractServer):
         static = self.config.static
 
         # Check if we are running in dev or debug mode
-        debug = self.config.debug
+        is_dev = self.config.is_dev
         entrypoint = self.config.entrypoint
-        if debug and not entrypoint:
+        if is_dev and not entrypoint:
             TRACER.warn_no_reload()
-            debug = False
+            is_dev = False
 
         # Mount the static path afetr all routes were registered
         if static and os.path.isdir(static):
@@ -113,7 +114,7 @@ class FastAPIServer(AbstractServer):
 
         # Start the server using the target (request handler) type
         handle = self.app if not entrypoint else entrypoint
-        uvicorn.run(handle, host=host, port=port, reload=debug)
+        uvicorn.run(handle, host=host, port=port, reload=is_dev)
 
     def static(self, path):
         self.config.static = path  # Will be loaded on start

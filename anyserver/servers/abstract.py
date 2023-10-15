@@ -4,9 +4,7 @@ from abc import ABC, abstractmethod
 from importlib import import_module
 
 from anyserver import GetConfig
-from anyserver.config import Environment
-from anyserver.debug import TRACER
-from anyserver.router import WebRouter
+from anyserver.utils.tracer import TRACER
 from anyserver.templates import TemplateRouter
 
 

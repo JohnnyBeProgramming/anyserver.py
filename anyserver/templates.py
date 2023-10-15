@@ -4,7 +4,7 @@ import importlib
 
 from glob import glob
 
-from anyserver.debug import TRACER
+from anyserver.utils.tracer import TRACER
 from anyserver.router import WebRouter
 from anyserver.encoder import Encoder
 

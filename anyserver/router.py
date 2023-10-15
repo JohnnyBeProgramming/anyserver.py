@@ -4,8 +4,8 @@ import json
 
 from urllib.request import urlopen, Request
 
-from anyserver.config import Environment
-from anyserver.debug import TRACER
+from anyserver.config import ServerConfig
+from anyserver.utils.tracer import TRACER
 
 
 class Serializable:
@@ -49,7 +49,8 @@ class WebRouter(ABC):
                 prefix = self.prefix or ''
                 route = prefix + sub_path
                 action = routes[verb][sub_path]
-                if Environment.IS_DEV:
+                if ServerConfig.is_dev:
+                    # In development mode, we print request details
                     action = self.tracer(verb, route, action)
                 self.route(verb, route)(action)
 

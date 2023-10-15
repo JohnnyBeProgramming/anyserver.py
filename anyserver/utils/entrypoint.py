@@ -4,19 +4,20 @@ import logging
 import os
 import re
 
+from anyserver.domain.entities.config import ServerConfig
+
 
 class Entrypoint():
     found = None
-    debug = False
 
     @staticmethod
     def get():
-        def debug(msg): return logging.debug(msg) if Entrypoint.debug else None
+        def debug(msg): return logging.debug(msg)
 
         if Entrypoint.found:
             return Entrypoint.found
 
-        debug(f'Finding entrypoint from stack trace... {Entrypoint.found}')
+        debug(f'Finding entrypoint from stack trace...')
         stack = inspect.stack()
         for frame in stack:
             if not len(frame) > 5:

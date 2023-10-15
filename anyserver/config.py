@@ -4,36 +4,13 @@ import sys
 import logging
 import argparse
 
+from anyserver.domain.entities.config import ServerConfig
 from anyserver.encoder import Encoder
-
-
-class Environment:
-    IS_DEV = False
-
-
-class ServerConfig:
-    # Host configuration
-    host = '0.0.0.0'
-    port = 9999
-
-    # Runtime settings
-    working = "."
-    templates = "./templates"
-    plugins = []
-
-    # Optional: Define the default route hander as one of the following
-    static = None
-    proxy = None
-
-    debug = False
-    discover = True
-    entrypoint = None
-    routes = {}
 
 
 def GetConfig():
     opts = GetArgs()
-    
+
     config = ServerConfig()
 
     # Try and load from config file (if specified)
@@ -76,12 +53,6 @@ def GetArgs(argv=sys.argv[1:]):
                         default=os.getenv('WORK_DIR')
                         )
 
-    # Allow the loading of plugins
-    parser.add_argument('-a', '--add',
-                        dest='plugins',
-                        help='List of plugins to load',
-                        type=lambda s: [item for item in s.split(',')])
-
     # Allow the user to specify the type of server that will be created
     parser.add_argument('-s', '--static',
                         dest='static',
@@ -101,22 +72,29 @@ def GetArgs(argv=sys.argv[1:]):
                         const=True,
                         default=False,
                         )
-    parser.add_argument('--verbose',
-                        help="Be verbose",
-                        action="store_const", dest="loglevel",
-                        const=logging.INFO,
-                        default=logging.WARN,
+    parser.add_argument('--dev',
+                        help="Start in development mode",
+                        dest="development",
+                        action="store_const",
+                        const=True,
+                        default=False,
                         )
 
     # Parse the args provided by the CLI
     args = parser.parse_args(argv)
 
-    # Set the log verbosity
-    format = '%(message)s'
-    args.loglevel = logging.DEBUG if args.debug else args.loglevel
-    logging.basicConfig(format=format, level=args.loglevel)
+    ServerConfig.debug = args.debug
+    ServerConfig.is_dev = args.development
 
-    Environment.IS_DEV = args.debug
+    # Set the log verbosity
+    log_level = logging.WARN
+    if args.debug:
+        log_level = logging.DEBUG
+    elif args.development:
+        log_level = logging.INFO
+
+    format = '%(message)s'
+    logging.basicConfig(format=format, level=log_level)
 
     return args
 
@@ -126,4 +104,3 @@ def ApplyArgs(config, args):
         if val and key != "config":
             setattr(config, key, val)
     return config
-
