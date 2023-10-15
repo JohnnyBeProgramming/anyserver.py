@@ -4,14 +4,14 @@ import sys
 import logging
 import argparse
 
-from anyserver.domain.entities.config import ServerConfig
+from anyserver.domain.entities.config import AnyConfig
 from anyserver.encoder import Encoder
 
 
 def GetConfig():
     opts = GetArgs()
 
-    config = ServerConfig()
+    config = AnyConfig()
 
     # Try and load from config file (if specified)
     if opts.config and os.path.isfile(opts.config):
@@ -83,8 +83,8 @@ def GetArgs(argv=sys.argv[1:]):
     # Parse the args provided by the CLI
     args = parser.parse_args(argv)
 
-    ServerConfig.debug = args.debug
-    ServerConfig.is_dev = args.development
+    AnyConfig.debug = args.debug
+    AnyConfig.is_dev = args.development
 
     # Set the log verbosity
     log_level = logging.WARN

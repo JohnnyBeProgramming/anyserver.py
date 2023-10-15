@@ -5,7 +5,7 @@ import sys
 
 import yaml
 
-from anyserver.config import ServerConfig
+from anyserver.config import AnyConfig
 
 
 def trace(msg): logging.info(msg)
@@ -148,7 +148,7 @@ class TRACER:
 
     @staticmethod
     def req_start(verb, path, *args, **kwargs):
-        if not ServerConfig.is_dev:
+        if not AnyConfig.is_dev:
             return
         # Try and resolve the request object from the incoming args
         req = args[0] if len(args) > 0 else None
@@ -169,7 +169,7 @@ class TRACER:
 
     @staticmethod
     def req_end(**kwargs):
-        if not ServerConfig.is_dev:
+        if not AnyConfig.is_dev:
             return
         label = 'DONE' if not "status" in kwargs else kwargs["status"]
         prefix = C.dim("«-- [ ")
@@ -188,7 +188,7 @@ class TRACER:
 
     @staticmethod
     def req_fail(verb, path, error):
-        if not ServerConfig.is_dev:
+        if not AnyConfig.is_dev:
             return
         label = 'FAILED'
         message = str(error) if error else ""

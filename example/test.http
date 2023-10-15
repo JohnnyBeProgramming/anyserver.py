@@ -10,7 +10,7 @@
 curl {{target-url}}/
 
 ### GET the test route
-curl {{target-url}}/api
+curl {{target-url}}/api?path=/path/to/dir/&debug=true
 
 ### Get HTMX version
 POST {{target-url}}/test

@@ -12,7 +12,6 @@ app.register(STATUS_ROUTES)
 app.register(TEST_ROUTES)
 #app.register(TODO_ROUTES)
 
-
 def main():
     app.start()
 

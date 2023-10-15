@@ -1,6 +1,6 @@
 
 
-class ServerConfig:
+class AnyConfig:
     # Host configuration
     host = '0.0.0.0'
     port = 9999

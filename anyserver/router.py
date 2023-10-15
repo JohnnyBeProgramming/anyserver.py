@@ -4,7 +4,7 @@ import json
 
 from urllib.request import urlopen, Request
 
-from anyserver.config import ServerConfig
+from anyserver.config import AnyConfig
 from anyserver.utils.tracer import TRACER, trace
 
 
@@ -49,7 +49,7 @@ class WebRouter(ABC):
                 prefix = self.prefix or ''
                 route = prefix + sub_path
                 action = routes[verb][sub_path]
-                if ServerConfig.is_dev:
+                if AnyConfig.is_dev:
                     # In development mode, we print request details
                     action = self.tracer(verb, route, action)
                 self.route(verb, route)(action)

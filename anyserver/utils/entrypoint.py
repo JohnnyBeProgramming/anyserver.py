@@ -4,7 +4,7 @@ import logging
 import os
 import re
 
-from anyserver.domain.entities.config import ServerConfig
+from anyserver.domain.entities.config import AnyConfig
 
 
 class Entrypoint():
