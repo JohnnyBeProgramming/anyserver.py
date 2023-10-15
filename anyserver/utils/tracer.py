@@ -3,10 +3,8 @@ import logging
 import os
 import sys
 
-import yaml
-
 from anyserver.config import AnyConfig
-
+from anyserver.encoder import JSON, YAML
 
 
 def supports_color():
@@ -74,6 +72,7 @@ def traceIf(msg, value):
         output = f'{msg} {C.bright(value)}'
         trace(output)
 
+
 class TRACER:
 
     @staticmethod
@@ -109,10 +108,10 @@ class TRACER:
         trace(C.DIM + f' + [ {verb} ] {route}' + C.RESET)
 
     @staticmethod
-    def print_config(config):
+    def print_config(config: AnyConfig):
         trace(C.DIM + '-' * 64 + C.RESET)
 
-        traceIf(' + Dev Mode:', config.development)
+        traceIf(' + Dev Mode:', config.is_dev)
         traceIf(' + Work Dir:', config.working)
         traceIf(' + Web Root:', config.static)
         traceIf(' ~ Proxy To:', config.proxy)
@@ -164,8 +163,8 @@ class TRACER:
 
         if '?' in req.url:
             # Found some query string(s)
-            output = yaml.safe_dump({"query": req.query})
-            trace(output.rstrip())
+            query = req.url.split('?')[1]
+            trace(f'query: {query}')
         if 'hx-request' in req.head:
             # This is a HTMX request
             TRACER.print_htmx_headers(req)
@@ -211,7 +210,7 @@ class TRACER:
             head = {}
             for k in filter(lambda k: k, req.head):
                 head[k] = req.head[k]
-        output = yaml.safe_dump({"head": head})
+        output = TRACER.trace_data({"head": head})
         trace(output.rstrip())
 
     @staticmethod
@@ -220,7 +219,7 @@ class TRACER:
             body = {}
             for k in req.body.keys():
                 body[k] = req.body[k]
-            output = yaml.safe_dump({"body": body})
+            output = TRACER.trace_data({"body": body})
             trace(output.rstrip())
 
     @staticmethod
@@ -232,3 +231,8 @@ class TRACER:
                 head[key] = req.head[key]
         if head:
             TRACER.req_head(req, head)
+
+    @staticmethod
+    def trace_data(data):
+        # Try and pretty print yaml, if available, otherwise print json
+        return YAML.encode(data) if YAML else JSON.encode(data)

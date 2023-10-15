@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from importlib import import_module
 
 from anyserver import GetConfig
-from anyserver.utils.tracer import TRACER
+from anyserver.utils.tracer import TRACER, traceIf
 from anyserver.routers.templates import TemplateRouter
 
 
@@ -46,6 +46,3 @@ class AbstractServer(TemplateRouter):
         signal.signal(signal.SIGINT, self.onExit)
 
     def onExit(self, signum, frame): return exit(1)
-
-    def discover(self, path="./routes"):
-        TRACER.printIf('Auto discovering routes in: %s', path)

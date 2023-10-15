@@ -5,7 +5,6 @@ app = AnyServer()
 
 
 def main():
-    app.discover()
     app.start()
 
 

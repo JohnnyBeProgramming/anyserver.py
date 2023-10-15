@@ -5,7 +5,8 @@ from functools import partial
 
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
-from anyserver.models import WebRequest, WebResponse
+from anyserver.models.request import WebRequest
+from anyserver.models.response import WebResponse
 from anyserver.servers.abstract import AbstractServer
 
 
