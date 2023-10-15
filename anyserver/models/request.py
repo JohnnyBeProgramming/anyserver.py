@@ -1,9 +1,16 @@
 
+from typing import Any, Dict, Optional
 from urllib.parse import parse_qs
-from anyserver.domain.models.base import Serializable
+from anyserver.models.base import Serializable
 
 
 class WebRequest(Serializable):
+    url: str
+    verb: str
+    path: str
+    head: Dict[str, str]
+    body: Optional[Any]
+    query: Dict[str, str]
 
     def __init__(self, url, verb, path, head={}, body=None, query={}):
         self.url = url

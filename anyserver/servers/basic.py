@@ -5,8 +5,8 @@ from functools import partial
 
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
-from anyserver.domain.models import WebRequest, WebResponse
-from anyserver.servers.base import AbstractServer
+from anyserver.models import WebRequest, WebResponse
+from anyserver.servers.abstract import AbstractServer
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -138,7 +138,7 @@ class Response(WebResponse):
             ctx.wfile.write(body.encode('utf8'))
 
 
-class SimpleServer(AbstractServer):
+class BasicServer(AbstractServer):
 
     def __init__(self, prefix='', config=None, app=None):
         # Initialise the base server instance

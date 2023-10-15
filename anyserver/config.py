@@ -4,13 +4,12 @@ import sys
 import logging
 import argparse
 
-from anyserver.domain.entities.config import AnyConfig
+from anyserver.models.config import AnyConfig
 from anyserver.encoder import Encoder
 
 
 def GetConfig():
     opts = GetArgs()
-
     config = AnyConfig()
 
     # Try and load from config file (if specified)

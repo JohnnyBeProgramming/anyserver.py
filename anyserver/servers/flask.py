@@ -1,8 +1,8 @@
 import os
 import logging
 
-from anyserver.domain.models import WebRequest, WebResponse
-from anyserver.servers.base import AbstractServer
+from anyserver.models import WebRequest, WebResponse
+from anyserver.servers.abstract import AbstractServer
 from anyserver.utils.optionals import OptionalModule
 
 # Bootstrap the flask module (if available and installed as a dependency)

@@ -1,11 +1,11 @@
-from anyserver.servers.simple import SimpleServer
+from anyserver.servers.basic import BasicServer
 from anyserver.servers.fastapi import tryFastAPIServer
 from anyserver.servers.flask import tryFlaskServer
 
 SERVER_TYPES = {
     "FastAPI": tryFastAPIServer,
     "Flask": tryFlaskServer,
-    "Default": SimpleServer,
+    "Default": BasicServer,
 }
 
 
@@ -25,6 +25,6 @@ def AnyServer(app=None, config=None, prefers=None, prefix=''):
 
     # Fall back to the simple server implementation
     if not server:
-        server = SimpleServer(prefix, config, app)
+        server = BasicServer(prefix, config, app)
 
     return server

@@ -4,8 +4,6 @@ import logging
 import os
 import re
 
-from anyserver.domain.entities.config import AnyConfig
-
 
 class Entrypoint():
     found = None

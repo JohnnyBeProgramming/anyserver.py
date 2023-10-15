@@ -2,8 +2,8 @@ import os
 
 from anyserver.utils.tracer import TRACER
 from anyserver.utils.optionals import OptionalModule
-from anyserver.domain.models import WebRequest, WebResponse
-from anyserver.servers.base import AbstractServer
+from anyserver.models import WebRequest, WebResponse
+from anyserver.servers.abstract import AbstractServer
 from anyserver.utils.entrypoint import Entrypoint
 
 # Bootstrap the flask module (if available amd installed as a dependency)
