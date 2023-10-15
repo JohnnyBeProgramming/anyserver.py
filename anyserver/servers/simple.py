@@ -5,8 +5,8 @@ from functools import partial
 
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
-from anyserver.router import WebRequest, WebResponse
-from anyserver.servers.abstract import AbstractServer
+from anyserver.domain.models import WebRequest, WebResponse
+from anyserver.servers.base import AbstractServer
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -42,20 +42,33 @@ class Handler(SimpleHTTPRequestHandler):
 class Request(WebRequest):
     # Wrap your request object into serializable object
     def __init__(self, ctx: Handler):
+
+        # Build the URL string
         proto = 'http://'
         host = ctx.config.host
         port = ctx.config.port
         url = f'{proto}{host}:{port}{ctx.path}' if port else f'{proto}{host}:{ctx.path}'
+
+        # Strip the query string from the path
         path = ctx.path if not '?' in ctx.path else ctx.path.split('?')[0]
+
+        # Instantiate base class
         super().__init__(
             url=url,
             verb=ctx.command,
             path=path,
-            head=ctx.headers,
-            body=self.body(ctx, ctx.headers),
+            head=self._head(ctx.headers),
+            body=self._body(ctx, ctx.headers),
         )
 
-    def body(self, ctx, headers):
+    def _head(self, headers):
+        # Parse the headers (into serializable)
+        head = {}
+        for key in headers.keys():
+            head[key.lower()] = headers[key]
+        return head
+
+    def _body(self, ctx, headers):
         # Only try and parse the body for known methods (eg: POST, PUT)
         if not ctx.command in ["POST", "PUT", "PATCH"]:
             return None

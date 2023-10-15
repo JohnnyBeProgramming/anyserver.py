@@ -1,11 +1,9 @@
 import os
-import sys
-
-from urllib.parse import urlparse
 
 from anyserver.utils.tracer import TRACER
-from anyserver.router import WebRequest, WebResponse
-from anyserver.servers.abstract import AbstractServer, OptionalModule
+from anyserver.utils.optionals import OptionalModule
+from anyserver.domain.models import WebRequest, WebResponse
+from anyserver.servers.base import AbstractServer
 from anyserver.utils.entrypoint import Entrypoint
 
 # Bootstrap the flask module (if available amd installed as a dependency)
@@ -36,18 +34,23 @@ class FastAPIServer(AbstractServer):
     """
 
     class Request(WebRequest):
-        _ctx = None
 
         # Wrap your request object into serializable object
         def __init__(self, ctx):
-            self._ctx = request = ctx
             super().__init__(
-                url=str(request.url),
+                url=str(ctx.url),
                 verb=ctx.method,
                 path=ctx.url.path,
-                head=ctx.headers,
+                head=self._head(ctx.headers),
                 body=None,
             )
+
+        def _head(self, headers):
+            # Parse the headers (into serializable)
+            head = {}
+            for key in headers:
+                head[key.lower()] = headers[key]
+            return head
 
     class Response(WebResponse):
         __sent = False
@@ -130,7 +133,7 @@ class FastAPIServer(AbstractServer):
         Request = fastapi.Request
         Response = fastapi.Response
 
-        async def respond(request: Request, response: Response, raw_path: str | None = None):
+        async def respond(request: Request, response: Response):
             # Service the incomming request with the specified handler
             req = FastAPIServer.Request(request)
             req.body = await self._body(request)  # Fetch the body (async)

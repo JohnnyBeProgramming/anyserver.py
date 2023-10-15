@@ -1,10 +1,11 @@
 import os
 import logging
 
-from anyserver.router import WebRequest, WebResponse
-from anyserver.servers.abstract import AbstractServer, OptionalModule
+from anyserver.domain.models import WebRequest, WebResponse
+from anyserver.servers.base import AbstractServer
+from anyserver.utils.optionals import OptionalModule
 
-# Bootstrap the flask module (if available amd installed as a dependency)
+# Bootstrap the flask module (if available and installed as a dependency)
 flask = OptionalModule('flask', [
     'Flask',
     'Response',
@@ -31,23 +32,23 @@ class FlaskServer(AbstractServer):
     """
 
     class Request(WebRequest):
-        _ctx = None
 
         # Wrap your request object into serializable object
         def __init__(self, ctx):
-            self._ctx = ctx
-            self.url = ctx.url
-            self.head = ctx.headers
-            #self.query = ctx.args
-            print('QS --- ', ctx.args)
-            self.body = self._body(ctx)
             super().__init__(
                 url=ctx.url,
                 verb=ctx.method,
                 path=ctx.path,
-                head=self.head,
-                body=self.body
+                head=self._head(ctx.headers),
+                body=self._body(ctx)
             )
+
+        def _head(self, headers):
+            # Parse the headers (into serializable)
+            head = {}
+            for key in headers.keys():
+                head[key.lower()] = headers[key]
+            return head
 
         def _body(self, ctx):
             if not ctx.method in ["POST", "PUT", "PATCH"]:
@@ -113,7 +114,8 @@ class FlaskServer(AbstractServer):
         # Start the server using the target (request handler) type
         is_dev = self.config.is_dev
         os.environ['FLASK_ENV'] = "development" if is_dev else "production"
-        self.app.run(debug=is_dev, host=self.config.host, port=self.config.port)
+        self.app.run(debug=is_dev, host=self.config.host,
+                     port=self.config.port)
 
     def bind(self, verb, route, action):
 

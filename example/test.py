@@ -1,6 +1,6 @@
 import os
 from anyserver import WebRouter
-from anyserver.templates import TemplateRouter
+from anyserver.routers.templates import TemplateRouter
 
 THIS_DIR = os.path.dirname(os.path.realpath(__file__))
 

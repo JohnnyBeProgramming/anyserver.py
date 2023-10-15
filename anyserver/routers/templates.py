@@ -4,8 +4,8 @@ import importlib
 
 from glob import glob
 
+from anyserver.routers.router import WebRouter
 from anyserver.utils.tracer import TRACER
-from anyserver.router import WebRouter
 from anyserver.encoder import Encoder
 
 logger = logging.getLogger('templates')

@@ -19,6 +19,5 @@ def GetStatus(req, resp):
 
     # Return the body of the response (encoding done by router)
     return {
-        "url": req.url,
         "status": "online",
     }

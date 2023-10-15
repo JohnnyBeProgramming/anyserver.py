@@ -1,53 +1,10 @@
 from abc import ABC
 import re
-import json
-from urllib import parse
 
 from urllib.request import urlopen, Request
 
 from anyserver.config import AnyConfig
 from anyserver.utils.tracer import TRACER, trace
-
-
-class Serializable:
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
-
-
-class WebRequest(Serializable):
-    _query = None
-
-    def __init__(self, url, verb, path, head={}, body=None, query={}):
-        self.url = url
-        self.verb = verb
-        self.path = path
-        self.head = head
-        self.body = body
-        self._query = query
-
-    @property
-    def query(self):
-        if self._query:
-            return self._query
-
-        query = {}
-        parts = self.url.split('?')[1] if '?' in self.url else ''
-        parsed = parse.parse_qs(parts) if parts else {}
-        for key in parsed:
-            vals = parsed[key]
-            vals = vals if len(vals) != 1 else vals[0]
-            query[key] = vals
-        self._query = query
-        return query
-
-
-class WebResponse(Serializable):
-    def __init__(self, verb, path, head, body, status=200):
-        self.verb = verb
-        self.path = path
-        self.status = status
-        self.head = head
-        self.body = body
 
 
 class WebRouter(ABC):
@@ -116,23 +73,17 @@ class WebRouter(ABC):
         message += "Verb: %s, Path: %s\n" % (verb, path)
         raise Exception('FATAL: %s' % message)
 
-    def head(self, path):
-        return self.route("HEAD", path)
+    def head(self, path): return self.route("HEAD", path)
 
-    def get(self, path):
-        return self.route("GET", path)
+    def get(self, path): return self.route("GET", path)
 
-    def post(self, path):
-        return self.route("POST", path)
+    def post(self, path): return self.route("POST", path)
 
-    def put(self, path):
-        return self.route("PUT", path)
+    def put(self, path): return self.route("PUT", path)
 
-    def patch(self, path):
-        return self.route("PATCH", path)
+    def patch(self, path): return self.route("PATCH", path)
 
-    def delete(self, path):
-        return self.route("DELETE", path)
+    def delete(self, path): return self.route("DELETE", path)
 
     def tracer(self, verb, path, action):
         # Define a simple function that can help us trace through requests in DEV mode
