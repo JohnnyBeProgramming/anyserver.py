@@ -9,21 +9,51 @@ from anyserver.router import WebRequest, WebResponse
 from anyserver.servers.abstract import AbstractServer
 
 
+class Handler(SimpleHTTPRequestHandler):
+    # Bind your route handlers into our router's path resolvers
+    def __init__(self, server, *extra_args, **kwargs):
+        self.reply = server.reply
+        self.config = server.config
+        super().__init__(directory=server.config.static, *extra_args, **kwargs)
+
+    def do_DEFAULT(self, verb):
+        # If no custom routes were triggered, this function will be called..
+        # We will check for default actions in this order:
+        #  1) config.static - (PATH) Serve static content
+        #  2) Fallback: Send "Not found"
+        if verb == "GET" and self.config.static:
+            # Serve contents from the specified static folder
+            return self.do_STATIC()
+        else:
+            # The default action is to reply: "Not found"
+            self.send_response(404, "Not Found")
+            self.end_headers()
+
+    def do_REPLY(self, verb): self.reply(verb, self.path, self)
+    def do_STATIC(self): super().do_GET()
+    def do_HEAD(self): self.do_GET()
+    def do_GET(self): self.do_REPLY("GET")
+    def do_POST(self): self.do_REPLY("POST")
+    def do_PUT(self): self.do_REPLY("PUT")
+    def do_PATCH(self): self.do_REPLY("PATCH")
+    def do_DELETE(self): self.do_REPLY("DELETE")
+
+
 class Request(WebRequest):
     # Wrap your request object into serializable object
-    def __init__(self, ctx): super().__init__(
-        verb=ctx.command,
-        path=ctx.path,
-        head=ctx.headers,
-        body=self.body(ctx, ctx.headers),
-        params=self.query(ctx),
-    )
-
-    def query(self, ctx):
-        path_parts = ctx.path.split('?')
-        if len(path_parts) > 1:
-            return parse.parse_qs(path_parts[1])
-        return {}
+    def __init__(self, ctx: Handler):
+        proto = 'http://'
+        host = ctx.config.host
+        port = ctx.config.port
+        url = f'{proto}{host}:{port}{ctx.path}' if port else f'{proto}{host}:{ctx.path}'
+        path = ctx.path if not '?' in ctx.path else ctx.path.split('?')[0]
+        super().__init__(
+            url=url,
+            verb=ctx.command,
+            path=path,
+            head=ctx.headers,
+            body=self.body(ctx, ctx.headers),
+        )
 
     def body(self, ctx, headers):
         # Only try and parse the body for known methods (eg: POST, PUT)
@@ -95,36 +125,6 @@ class Response(WebResponse):
             ctx.wfile.write(body.encode('utf8'))
 
 
-class Handler(SimpleHTTPRequestHandler):
-    # Bind your route handlers into our router's path resolvers
-    def __init__(self, server, *extra_args, **kwargs):
-        self.reply = server.reply
-        self.config = server.config
-        super().__init__(directory=server.config.static, *extra_args, **kwargs)
-
-    def do_DEFAULT(self, verb):
-        # If no custom routes were triggered, this function will be called..
-        # We will check for default actions in this order:
-        #  1) config.static - (PATH) Serve static content
-        #  2) Fallback: Send "Not found"
-        if verb == "GET" and self.config.static:
-            # Serve contents from the specified static folder
-            return self.do_STATIC()
-        else:
-            # The default action is to reply: "Not found"
-            self.send_response(404, "Not Found")
-            self.end_headers()
-
-    def do_REPLY(self, verb): self.reply(verb, self.path, self)
-    def do_STATIC(self): super().do_GET()
-    def do_HEAD(self): self.do_GET()
-    def do_GET(self): self.do_REPLY("GET")
-    def do_POST(self): self.do_REPLY("POST")
-    def do_PUT(self): self.do_REPLY("PUT")
-    def do_PATCH(self): self.do_REPLY("PATCH")
-    def do_DELETE(self): self.do_REPLY("DELETE")
-
-
 class SimpleServer(AbstractServer):
 
     def __init__(self, prefix='', config=None, app=None):
@@ -148,7 +148,7 @@ class SimpleServer(AbstractServer):
         # No additonal steps required, route already cached
         pass
 
-    def reply(self, verb, path, ctx):
+    def reply(self, verb, path, ctx: Handler):
         # This method is called from the `Handler` interface, each time a route is intercepted
         # See if we can match a route to the current verb
         action = self.find_route(verb, path)
@@ -169,6 +169,7 @@ class SimpleServer(AbstractServer):
 
         # Send the response UTF encoded (if defined)
         if type(data) == str:
-            ctx.wfile.write(data.encode('utf8'))
+            output = data.encode('utf8')
+            ctx.wfile.write(output)
         elif data:
             raise Exception('Response could not be encoded to text: %s' % data)

@@ -8,14 +8,6 @@ import yaml
 from anyserver.config import AnyConfig
 
 
-def trace(msg): logging.info(msg)
-
-
-def traceIf(msg, value):
-    if value:
-        output = f'{msg} {C.bright(value)}'
-        trace(C.DIM + output + C.RESET)
-
 
 def supports_color():
     """
@@ -73,6 +65,14 @@ class C:
     def hyperlink(msg):
         return C.RESET + C.UNDERLINE + C.BLUE + msg + C.RESET
 
+
+def trace(msg): logging.info(C.DIM + msg + C.RESET)
+
+
+def traceIf(msg, value):
+    if value:
+        output = f'{msg} {C.bright(value)}'
+        trace(output)
 
 class TRACER:
 
@@ -160,9 +160,14 @@ class TRACER:
         fVerb = f'{C.RESET}{C.BOLD}{req.verb}{C.RESET}{C.DIM}'
         fPath = f'{C.RESET}{C.BOLD}{req.path}{C.RESET}{C.DIM}'
         fTail = '-'*(64 - 9 - len(req.verb) - len(req.path))
-        trace(f'{C.DIM}--» [ {fVerb} {fPath} ] {fTail}')
+        trace(f'{C.DIM}--» [ {fVerb} {fPath} ] {fTail}{C.RESET}')
 
+        if '?' in req.url:
+            # Found some query string(s)
+            output = yaml.safe_dump({"query": req.query})
+            trace(output.rstrip())
         if 'hx-request' in req.head:
+            # This is a HTMX request
             TRACER.print_htmx_headers(req)
         if req.body:
             TRACER.req_body(req)

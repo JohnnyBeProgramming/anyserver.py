@@ -31,18 +31,21 @@ class FlaskServer(AbstractServer):
     """
 
     class Request(WebRequest):
+        _ctx = None
 
         # Wrap your request object into serializable object
         def __init__(self, ctx):
-            self.ctx = ctx
+            self._ctx = ctx
+            self.url = ctx.url
             self.head = ctx.headers
-            self.params = ctx.args
+            #self.query = ctx.args
+            print('QS --- ', ctx.args)
             self.body = self._body(ctx)
             super().__init__(
+                url=ctx.url,
                 verb=ctx.method,
                 path=ctx.path,
                 head=self.head,
-                params=self.params,
                 body=self.body
             )
 
@@ -108,9 +111,9 @@ class FlaskServer(AbstractServer):
         self.onStart()
 
         # Start the server using the target (request handler) type
-        debug = self.config.loglevel == logging.DEBUG
-        os.environ['FLASK_ENV'] = "development" if debug else "production"
-        self.app.run(debug=debug, host=self.config.host, port=self.config.port)
+        is_dev = self.config.is_dev
+        os.environ['FLASK_ENV'] = "development" if is_dev else "production"
+        self.app.run(debug=is_dev, host=self.config.host, port=self.config.port)
 
     def bind(self, verb, route, action):
 

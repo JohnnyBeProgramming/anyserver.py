@@ -1,6 +1,7 @@
 from abc import ABC
 import re
 import json
+from urllib import parse
 
 from urllib.request import urlopen, Request
 
@@ -14,12 +15,30 @@ class Serializable:
 
 
 class WebRequest(Serializable):
-    def __init__(self, verb, path, head={}, body=None, params={}):
+    _query = None
+
+    def __init__(self, url, verb, path, head={}, body=None, query={}):
+        self.url = url
         self.verb = verb
         self.path = path
         self.head = head
         self.body = body
-        self.params = params
+        self._query = query
+
+    @property
+    def query(self):
+        if self._query:
+            return self._query
+
+        query = {}
+        parts = self.url.split('?')[1] if '?' in self.url else ''
+        parsed = parse.parse_qs(parts) if parts else {}
+        for key in parsed:
+            vals = parsed[key]
+            vals = vals if len(vals) != 1 else vals[0]
+            query[key] = vals
+        self._query = query
+        return query
 
 
 class WebResponse(Serializable):
