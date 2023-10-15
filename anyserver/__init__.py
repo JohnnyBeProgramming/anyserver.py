@@ -1,6 +1,7 @@
 
 from anyserver.config import GetConfig
 
+from anyserver.models.config import AnyConfig
 from anyserver.models.request import WebRequest
 from anyserver.models.response import WebResponse
 from anyserver.routers.router import WebRouter
