@@ -1,5 +1,5 @@
 
-from anyserver.encoders import Encoder
+from anyserver.encoders.core import Encoder
 
 
 class HtmlEncoder(Encoder):

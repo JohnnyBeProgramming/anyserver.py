@@ -2,7 +2,8 @@ import os
 
 from anyserver.utils.tracer import TRACER
 from anyserver.utils.optionals import OptionalModule
-from anyserver.models import WebRequest, WebResponse
+from anyserver.models.request import WebRequest
+from anyserver.models.response import WebResponse
 from anyserver.servers.abstract import AbstractServer
 from anyserver.utils.entrypoint import Entrypoint
 

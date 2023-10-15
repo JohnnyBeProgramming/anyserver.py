@@ -1,6 +1,6 @@
 import json
 
-from anyserver.encoders import Encoder
+from anyserver.encoders.core import Encoder
 
 
 class JsonEncoder(Encoder):

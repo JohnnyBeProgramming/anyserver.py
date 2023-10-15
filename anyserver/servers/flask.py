@@ -1,7 +1,7 @@
 import os
-import logging
 
-from anyserver.models import WebRequest, WebResponse
+from anyserver.models.request import WebRequest
+from anyserver.models.response import WebResponse
 from anyserver.servers.abstract import AbstractServer
 from anyserver.utils.optionals import OptionalModule
 

@@ -4,7 +4,7 @@ import os
 import sys
 
 from anyserver.config import AnyConfig
-from anyserver.encoders import JSON, YAML
+from anyserver.encoders.core import JSON, YAML
 
 
 def supports_color():

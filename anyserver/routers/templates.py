@@ -6,7 +6,7 @@ from glob import glob
 
 from anyserver.routers.router import WebRouter
 from anyserver.utils.tracer import TRACER
-from anyserver.encoders import Encoder
+from anyserver.encoders.core import Encoder
 
 logger = logging.getLogger('templates')
 
