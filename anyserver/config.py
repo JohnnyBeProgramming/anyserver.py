@@ -5,7 +5,7 @@ import logging
 import argparse
 
 from anyserver.models.config import AnyConfig
-from anyserver.encoder import Encoder
+from anyserver.encoders import Encoder
 
 
 def GetConfig():

@@ -2,7 +2,7 @@
 import io
 import csv
 
-from anyserver.encoder import Encoder
+from anyserver.encoders import Encoder
 
 
 class CsvEncoder(Encoder):

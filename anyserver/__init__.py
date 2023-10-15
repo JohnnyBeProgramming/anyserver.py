@@ -4,7 +4,7 @@ from anyserver.config import GetConfig
 from anyserver.models import WebRequest, WebResponse
 from anyserver.routers.router import WebRouter
 
-from anyserver.encoder import Encoder, CsvEncoder, JsonEncoder, TextEncoder, YamlEncoder
+from anyserver.encoders import Encoder, CSV, TEXT, JSON, YAML
 
 from anyserver.server import AnyServer
 from anyserver.servers.abstract import AbstractServer

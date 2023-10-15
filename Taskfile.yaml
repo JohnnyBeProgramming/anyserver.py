@@ -10,7 +10,7 @@ env: # <-- Project Configuration (required ENV vars)
 silent: true # <-- Less verbose
 tasks:
   # Start web / proxy server
-  start: python3 server.py {{ .CLI_ARGS }}
+  start: python3 server.py {{ .CLI_ARGS | default "--dev" }}
 
   # Build the artifacts to be released
   build:

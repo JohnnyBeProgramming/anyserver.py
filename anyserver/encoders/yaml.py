@@ -1,7 +1,7 @@
 
 import io
 
-from anyserver.encoder import Encoder
+from anyserver.encoders import Encoder
 
 
 class YamlEncoder(Encoder):
