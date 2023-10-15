@@ -1,4 +1,33 @@
-todos = [
+import os
+from anyserver import TemplateRouter
+
+THIS_DIR = os.path.dirname(os.path.realpath(__file__))
+
+# Create decorator for registering web routes
+router = TemplateRouter('/todo', base=f'{THIS_DIR}/templates')
+
+
+@router.get('/')
+@router.renders("todo/home")
+def todo_index(req, resp):
+    return {"todos": MOCKED_DATA}
+
+
+@router.get('/list')
+def todo_list(req, resp):
+    return MOCKED_DATA
+
+
+@router.post('/search')
+@router.renders("todo/list")
+def search_todo(req, resp):
+    terms = "" if req.body and not "search" in req.body else req.body["search"]
+    found = MOCKED_DATA
+    if len(terms):
+        found = list(filter(lambda todo: terms in todo["title"], MOCKED_DATA))
+    return {"todos": found}
+
+MOCKED_DATA = [
     {"userId": 1, "id": 1, "title": "delectus aut autem", "completed": False},
     {
         "userId": 1,

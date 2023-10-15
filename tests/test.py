@@ -9,7 +9,7 @@ router = TemplateRouter('/test', base=f'{THIS_DIR}/templates')
 
 
 @router.get('')
-@router.renders('test/index')
+@router.renders('index')
 def GetStatus(req, resp):
     return {
         "status": "online",
