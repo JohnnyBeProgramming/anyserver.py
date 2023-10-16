@@ -1,15 +1,52 @@
-{% if todos|length>0 %}
-  {% for todo in todos %}
-    <tr class="bg-white lg:hover:bg-gray-100 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0">
-      <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">{{todo.id}}</td>
-      <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">{{todo.title}}</td>
-      <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">
-        {% if todo.completed %}
-          <span class="rounded bg-green-400 py-1 px-3 text-xs font-bold">Yes</span>
-        {% else %}
-          <span class="rounded bg-red-400 py-1 px-3 text-xs font-bold">No</span>
-        {% endif %}
-      </td>
-    </tr>
-  {% endfor %}
+{% if todos|length>0 %} {% for todo in todos %}
+<!--
+{% set id=todo.id %}
+
+{% if todo.completed %}
+{% set icon='icons/task-done.svg' %}
+{% set style='text-gray-400 dark:text-gray-600 line-through' %}
+{% else %}
+{% set icon='icons/task-active.svg' %}
+{% set style='text-gray-700 dark:text-gray-300' %}
+{% endif %}
+-->
+<tr
+  id="todo_{{id}}"
+  class="bg-white dark:bg-gray-900 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0"
+>
+  <td
+    class="w-full lg:w-auto p-0 text-center border border-b border-gray-200 dark:border-gray-800 block lg:table-cell relative lg:static"
+  >
+    <div class="w-6 h-6 mx-4">
+      <!-- {% if todo.completed %} -->
+      <span class="mr-2 cursor-pointer opacity-25 hover:opacity-100"
+        >{% include 'icons/restore.svg' %}</span
+      >
+      <!-- {% else %} -->
+      <span class="mr-2 cursor-pointer opacity-50 hover:opacity-100"
+        >{% include 'icons/check.svg' %}</span
+      >
+      <!-- {% endif %} -->
+    </div>
+  </td>
+  <td
+    class="w-full lg:w-auto p-3 px-4 text-left border border-b border-gray-200 dark:border-gray-800 block lg:table-cell relative lg:static"
+  >
+    <div class="flex flex-row {{style}}">
+      <span class="mr-4"> {% include icon %} </span>
+      {{todo.title}}
+    </div>
+  </td>
+  <td
+    class="w-full lg:w-auto p-3 text-end border border-b border-gray-200 dark:border-gray-800 block lg:table-cell relative lg:static"
+  >
+    {% include 'todo/actions.html' %}
+  </td>
+</tr>
+{% endfor %} {% else %}
+<tr
+  class="bg-white dark:bg-gray-900 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0 text-gray-400 dark:text-gray-600"
+>
+  <td colspan="3" class="py-4 text-center">{% include 'todo/empty.html' %}</td>
+</tr>
 {% endif %}

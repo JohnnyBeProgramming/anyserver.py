@@ -23,7 +23,7 @@
   </head>
   <body>
     <!-- Main template -->
-    <main
+    <div
       class="flex flex-col min-h-screen w-full bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400"
     >
       <!-- App Toolbar -->
@@ -244,8 +244,8 @@
         </nav>
 
         <!-- Main content page -->
-        <div class="flex flex-grow">
-          <main id="main" class="p-4">
+        <div class="flex flex-row flex-1">
+          <main id="main" class="flex flex-col flex-1">
             {% block content %}
             <div class="text-gray-300 dark:text-gray-700">
               <span>Target:</span>
@@ -263,8 +263,9 @@
           {% block aside %}{% endblock aside %}
         </aside>
       </div>
-    </main>
+    </div>
 
+    <!-- Light / Dark Toggle -->
     <script>
       tailwind.config = {
         darkMode: "class",

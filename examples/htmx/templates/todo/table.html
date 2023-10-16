@@ -1,0 +1,26 @@
+<table class="border-collapse w-fill">
+  <thead>
+    <tr
+      class="font-bold uppercase bg-gray-400 dark:bg-gray-600 text-gray-600 dark:text-gray-400"
+    >
+      <th
+        class="text-center w-16 p-3 hidden lg:table-cell border border-gray-300 dark:border-gray-500"
+      >
+        #
+      </th>
+      <th
+        class="text-left p-3 hidden lg:table-cell border border-gray-300 dark:border-gray-500"
+      >
+        Title
+      </th>
+      <th
+        class="text-center w-20 p-3 hidden lg:table-cell border border-gray-300 dark:border-gray-500"
+      >
+        Action
+      </th>
+    </tr>
+  </thead>
+  <tbody id="todo-results">
+    {% include 'todo/list.html' %}
+  </tbody>
+</table>
