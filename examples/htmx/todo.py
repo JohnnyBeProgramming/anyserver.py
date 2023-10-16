@@ -13,11 +13,6 @@ def todo_index(req, resp):
     return {"todos": MOCKED_DATA}
 
 
-@router.get('/list')
-def todo_list(req, resp):
-    return MOCKED_DATA
-
-
 @router.post('/search')
 @router.renders("todo/list")
 def search_todo(req, resp):
@@ -25,7 +20,8 @@ def search_todo(req, resp):
     found = MOCKED_DATA
     if len(terms):
         found = list(filter(lambda todo: terms in todo["title"], MOCKED_DATA))
-    return {"todos": found}
+    return {"todos": found, "count": len(found)}
+
 
 MOCKED_DATA = [
     {"userId": 1, "id": 1, "title": "delectus aut autem", "completed": False},
