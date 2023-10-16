@@ -1,1 +1,1 @@
-anyserver==0.2.6
+anyserver>=0.2

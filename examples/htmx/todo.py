@@ -1,5 +1,5 @@
 import os
-import time
+
 from anyserver import TemplateRouter
 
 THIS_DIR = os.path.dirname(os.path.realpath(__file__))
