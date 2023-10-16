@@ -1,4 +1,7 @@
-<div
+<form
+  hx-post="/todo/search"
+  hx-target="#todo-results"
+  hx-swap="innerHTML"
   class="w-full flex flex-row bg-gray-300 dark:bg-gray-700 px-4 sm:justify-between"
 >
   <label for="search" class="px-4 py-3 font-bold">Search</label>
@@ -8,13 +11,17 @@
     name="search"
     placeholder="Filter by name or desc"
     hx-post="/todo/search"
+    hx-target="#todo-results"
+    hx-swap="innerHTML"
     hx-trigger="keyup changed delay:250ms"
     hx-indicator=".htmx-indicator"
-    hx-target="#todo-results"
-    class="flex-1 bg-white px-4 py-1 pr-10 my-2 rounded-full focus:outline-none"
+    class="flex-1 bg-white px-4 py-1 pr-10 my-1.5 rounded-full focus:outline-none"
   />
   <span class="htmx-indicator w-32 -ml-32 px-4 py-3">Searching...</span>
-  <label id="result-count" class="px-4 py-3">
+  <label id="result-count" class="w-32 px-4 py-3">
     {% include 'todo/count.html' %}
   </label>
-</div>
+  <div id="search-filters" class="flex">
+    {% include 'todo/filters.html' %}
+  </div>
+</form>

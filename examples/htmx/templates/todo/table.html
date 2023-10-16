@@ -6,24 +6,21 @@
   }
 </style>
 <table class="todo-table border-collapse w-fill">
-  <thead>
+  <thead class="border border-gray-300 dark:border-gray-500">
     <tr
       class="font-bold uppercase bg-gray-400 dark:bg-gray-600 text-gray-600 dark:text-gray-400"
     >
-      <th
-        class="text-center w-16 p-3 hidden lg:table-cell border border-gray-300 dark:border-gray-500"
-      >
-        #
-      </th>
-      <th
-        class="text-left p-3 hidden lg:table-cell border border-gray-300 dark:border-gray-500"
-      >
-        Title
-      </th>
-      <th
-        class="text-center w-20 p-3 hidden lg:table-cell border border-gray-300 dark:border-gray-500"
-      >
-        Action
+      <th class="text-center w-16 p-3 hidden lg:table-cell">#</th>
+      <th class="text-left p-3 hidden lg:table-cell">Title</th>
+      <th class="text-center w-8 p-3 hidden lg:table-cell">
+        <a
+          hx-delete="/todo?delete_all=true"
+          hx-confirm="You will delete ALL TASKS IN THIS CATEGORY! Are you sure?"
+          hx-target="#todo-results"
+          hx-swap="innerHTML"
+          class="w-6 h-6 cursor-pointer opacity-25 hover:opacity-100"
+          >{% include 'icons/trash.svg' %}
+        </a>
       </th>
     </tr>
   </thead>

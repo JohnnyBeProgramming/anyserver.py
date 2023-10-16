@@ -1,10 +1,13 @@
-
 <!-- Update search counter (out of bounds) -->
 <tr class="hidden">
-    <td id="result-count" hx-swap-oob="innerHTML">
-        {% include 'todo/count.html' %}
-    </td>
+  <td id="result-count" hx-swap-oob="innerHTML">
+    {% include 'todo/count.html' %}
+  </td>
+  <td id="search-filters" hx-swap-oob="innerHTML">
+    {% include 'todo/filters.html' %}
+  </td>
 </tr>
+
 
 <!-- List search results (in bounds) -->
 {% include 'todo/list.html' %}
