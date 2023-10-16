@@ -13,7 +13,10 @@ setup(
     packages=[
         name,
         f'{name}.encoders',
+        f'{name}.models',
+        f'{name}.routers',
         f'{name}.servers',
+        f'{name}.utils',
     ],
     version=version,
     license='MIT',
