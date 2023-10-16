@@ -1,4 +1,11 @@
-<table class="border-collapse w-fill">
+<!-- Add some CSS animations -->
+<style>
+  .todo-table tr.htmx-swapping td {
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+  }
+</style>
+<table class="todo-table border-collapse w-fill">
   <thead>
     <tr
       class="font-bold uppercase bg-gray-400 dark:bg-gray-600 text-gray-600 dark:text-gray-400"

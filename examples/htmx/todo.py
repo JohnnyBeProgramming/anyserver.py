@@ -8,19 +8,88 @@ router = TemplateRouter('/todo', base=f'{THIS_DIR}/templates')
 
 
 @router.get('/')
-@router.renders("todo/home")
+@router.renders("todo/index")
 def todo_index(req, resp):
-    return {"todos": MOCKED_DATA}
+    todos = MockedRepository.all()
+    return {"todos": todos}
 
 
 @router.post('/search')
-@router.renders("todo/list")
+@router.renders("todo/search")
 def search_todo(req, resp):
-    terms = "" if req.body and not "search" in req.body else req.body["search"]
-    found = MOCKED_DATA
-    if len(terms):
-        found = list(filter(lambda todo: terms in todo["title"], MOCKED_DATA))
-    return {"todos": found, "count": len(found)}
+    terms = req.body["search"] if req.body and "search" in req.body else ""
+    todos = MockedRepository.search(terms)
+    return {"todos": todos, "count": len(todos)}
+
+
+@router.post('/')
+@router.renders("todo/list-item")
+def update_todo(req, resp):
+    # Get the target task ID from the request body
+    task_id = req.query["id"] if req.query and "id" in req.query else ""
+    action = req.query["action"] if req.query and "action" in req.query else ""
+
+    # Search for the task and make sure it exists
+    found = MockedRepository.find(task_id)
+    if not found:
+        raise Exception(f'Task with id "{task_id}" not found')
+
+    # Process the update action
+    match action:
+        case "complete":
+            # Mark as complete
+            found["completed"] = True
+        case "restore":
+            # Mark as active
+            found["completed"] = False
+        case _:
+            raise Exception(f'Action "{action}" not recognised')
+
+    # Return the updated item (rendered as a template to swap out for current displayed item)
+    return {"todo": found}
+
+
+@router.delete('/')
+def update_todo(req, resp):
+    # Get the target task ID from the request body
+    task_id = req.query["id"] if req.query and "id" in req.query else ""
+
+    # Search for the task and make sure it exists
+    removed = MockedRepository.remove(task_id)
+    if not removed:
+        raise Exception(f'Task with id "{task_id}" not found')
+
+    # Send back empty response (to clear item content on frontend)
+    return ""
+
+
+class MockedRepository():
+
+    @staticmethod
+    def all():
+        return MOCKED_DATA
+
+    @staticmethod
+    def search(terms: str):
+        found = MOCKED_DATA
+        if len(terms):
+            found = list(
+                filter(lambda todo: terms in todo["title"], MOCKED_DATA))
+        return found
+
+    @staticmethod
+    def find(task_id: int):
+        search = filter(lambda todo: int(task_id) == todo["id"], MOCKED_DATA)
+        found = next(search) if task_id else None
+        return found
+
+    @staticmethod
+    def remove(task_id: int):
+        search = filter(lambda todo: int(task_id) == todo["id"], MOCKED_DATA)
+        found = next(search) if task_id else None
+        if found:
+            MOCKED_DATA.remove(found)
+        return found
 
 
 MOCKED_DATA = [
