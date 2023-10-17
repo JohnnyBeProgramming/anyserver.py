@@ -30,9 +30,9 @@ class WebRequest(Serializable):
             query[key] = vals
         return query
 
-    def header(self, name, default=''):
+    def header(self, name: str, default=''):
         head = self.head or {}
-        for key in filter(lambda k: k == name, head):
+        for key in filter(lambda k: k == name.lower(), head):
             return head[key]  # Key found
         return default  # Not found
 
@@ -42,9 +42,14 @@ class WebRequest(Serializable):
             return self.body[key]  # Key found
         return default  # Not found
 
-    def inputs(self, prefix=""):
+    def inputs(self, prefix="", strip_prefix=False):
         res = {}
         inputs = self.body or {}
         for key in filter(lambda k: k.startswith(prefix), inputs):
-            res[key] = inputs[key]
+            if prefix and strip_prefix:
+                subpath = key[len(prefix):]
+                res[subpath] = inputs[key]
+            else:
+                res[key] = inputs[key]
         return res
+
