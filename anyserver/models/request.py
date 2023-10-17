@@ -29,3 +29,22 @@ class WebRequest(Serializable):
             vals = vals if len(vals) != 1 else vals[0]
             query[key] = vals
         return query
+
+    def header(self, name, default=''):
+        head = self.head or {}
+        for key in filter(lambda k: k == name, head):
+            return head[key]  # Key found
+        return default  # Not found
+
+    def input(self, name):
+        inputs = self.body or {}
+        for key in filter(lambda k: k == name, inputs):
+            return self.body[key]  # Key found
+        return None  # Not found
+
+    def inputs(self, prefix=""):
+        res = {}
+        inputs = self.body or {}
+        for key in filter(lambda k: k.startswith(prefix), inputs):
+            res[key] = inputs[key]
+        return res
