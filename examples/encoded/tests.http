@@ -1,0 +1,29 @@
+
+# -------------------------------------------------------------------------
+# See: https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+# -------------------------------------------------------------------------
+@target-url=http://127.0.0.1:9999
+@route={{target-url}}/status
+# -------------------------------------------------------------------------
+curl {{route}}
+
+### GET result in HTML format (explicit accept)
+GET {{route}}
+accept: text/html
+
+
+### GET result in JSON format (serialised from encoder)
+GET {{route}}
+accept: application/json
+
+
+### GET result in YAML format
+GET {{route}}
+accept: application/yaml
+
+
+### GET result in CSV format
+GET {{route}}
+accept: text/csv
+
+

@@ -27,6 +27,9 @@ class TemplateRouter(WebRouter):
         for enc in encoders:
             self.encoders[enc.mime] = enc
 
+    def templates(self, path):
+        self.base = path
+
     def renders(self, path, content_type=''):
         if not self.jinja2:
             try:
@@ -85,7 +88,7 @@ class TemplateRouter(WebRouter):
                 "response": resp,
                 **data
             }
-        
+
         ref = action
 
         def formatted(req, resp, render=None, *args, **kwargs):
@@ -200,7 +203,7 @@ class TemplateRouter(WebRouter):
         # No render engine found for content type
         return None
 
-    def encode(self, data, ctype=None):        
+    def encode(self, data, ctype=None):
         # Fall back to default content type for encoding
         ctype = self.default_enc if not ctype else ctype
 

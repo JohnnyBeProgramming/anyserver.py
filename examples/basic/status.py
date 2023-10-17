@@ -1,5 +1,6 @@
 # Declare the HTTP routes to expose to the web server
-# routes = {
+# Basically translates to: 
+# router = {
 #     "GET": {
 #         '^/api/?$': GetStatus,
 #     }
