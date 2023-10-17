@@ -4,6 +4,7 @@ from anyserver.routers.templates import TemplateRouter
 
 THIS_DIR = os.path.dirname(os.path.realpath(__file__))
 
+# Explicitly look in this directory for templates
 router = TemplateRouter(base=f'{THIS_DIR}')
 
 
