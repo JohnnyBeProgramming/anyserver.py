@@ -3,7 +3,7 @@
 from anyserver import AnyServer
 
 from examples.basic.status import router as STATUS_ROUTES
-from examples.htmx.todo import router as TODO_ROUTES
+from examples.htmx.todo import TODO_ROUTES
 from tests import TEST_ROUTES
 
 # Declare the server instance and register all the routes

@@ -36,11 +36,11 @@ class WebRequest(Serializable):
             return head[key]  # Key found
         return default  # Not found
 
-    def input(self, name):
+    def input(self, name, default=None):
         inputs = self.body or {}
         for key in filter(lambda k: k == name, inputs):
             return self.body[key]  # Key found
-        return None  # Not found
+        return default  # Not found
 
     def inputs(self, prefix=""):
         res = {}

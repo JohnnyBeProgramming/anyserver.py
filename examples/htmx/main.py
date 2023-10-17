@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from anyserver import AnyServer
 
-from todo import router as TODO_ROUTES
+from todo.app import router as TODO_ROUTES
 
 app = AnyServer()
 app.static("./public")

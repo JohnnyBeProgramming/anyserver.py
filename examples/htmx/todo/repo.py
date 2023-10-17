@@ -1,93 +1,14 @@
-import os
-
-from anyserver import TemplateRouter
-
-THIS_DIR = os.path.dirname(os.path.realpath(__file__))
-
-# Create decorator for registering web routes
-router = TemplateRouter('/todo', base=f'{THIS_DIR}/templates')
-
-
-@router.get('/')
-@router.renders("todo/index")
-def todo_index(req, resp):
-    todos = MockedRepository.all()
-    return {"todos": todos, "filter": MockedRepository.FILTER}
-
-
-@router.post('/search')
-@router.renders("todo/search")
-def search_todo(req, resp):
-    terms = req.body["search"] if req.body and "search" in req.body else ""
-    filter = req.body["filter"] if req.body and "filter" in req.body else ""
-    if filter:
-        # Set the current filter
-        MockedRepository.FILTER = filter
-
-    todos = MockedRepository.search(terms)
-    return {"todos": todos, "filter": MockedRepository.FILTER}
-
-
-@router.post('/')
-@router.renders("todo/list-item")
-def update_todo(req, resp):
-    # Get the target task ID from the request body
-    task_id = req.query["id"] if req.query and "id" in req.query else ""
-    action = req.query["action"] if req.query and "action" in req.query else ""
-
-    # Search for the task and make sure it exists
-    found = MockedRepository.find(task_id)
-    if not found:
-        raise Exception(f'Task with id "{task_id}" not found')
-
-    # Process the update action
-    match action:
-        case "complete":
-            # Mark as complete
-            found["completed"] = True
-            if MockedRepository.FILTER == "active":
-                # In the case where only active values are filtered, remove the current row
-                return ""
-        case "restore":
-            # Mark as active
-            found["completed"] = False
-            if MockedRepository.FILTER == "completed":
-                # In the case where only active values are filtered, remove the current row
-                return ""
-        case _: pass
-
-    # Return the updated item (rendered as a template to swap out for current displayed item)
-    return {"todo": found}
-
-
-@router.delete('/')
-def delete_todo(req, resp):
-    # Get the target task ID from the request body
-    task_id = req.query["id"] if req.query and "id" in req.query else ""
-    delete_all = req.query["delete_all"] if req.query and "delete_all" in req.query else ""
-
-    if delete_all:
-        MockedRepository.clear()
-        # Send back empty response (to clear item content on frontend)
-        return router.render_template('todo/empty.html', {})
-    elif MockedRepository.remove(task_id):
-        # Send back empty response (to clear item content on frontend)
-        return ""
-    else:
-        raise Exception(f'Task with id "{task_id}" not found')
 
 
 class MockedRepository():
     FILTER = 'active'
 
-    @staticmethod
-    def all():
-        return MockedRepository.search('')
+    def all(self):
+        return self.search('')
 
-    @staticmethod
-    def search(terms: str):
+    def search(self, terms: str):
         found = MOCKED_DATA
-        type = MockedRepository.FILTER
+        type = self.FILTER
 
         # Filter by search terms
         if len(terms):
@@ -102,24 +23,21 @@ class MockedRepository():
 
         return found
 
-    @staticmethod
-    def find(task_id: int):
+    def find(self, task_id: int):
         search = list(filter(lambda todo: int(
             task_id) == todo["id"], MOCKED_DATA))
         found = search[0] if len(search) else None
         return found
 
-    @staticmethod
-    def remove(task_id: int):
-        found = MockedRepository.find(task_id)
+    def remove(self, task_id: int):
+        found = self.find(task_id)
         if found:
             MOCKED_DATA.remove(found)
         return found
 
-    @staticmethod
-    def clear():
+    def clear(self):
         found = []
-        match MockedRepository.FILTER:
+        match self.FILTER:
             case "active":
                 # Clear all active items
                 found = list(
@@ -130,10 +48,8 @@ class MockedRepository():
                     filter(lambda todo: todo["completed"], MOCKED_DATA))
             case "all":
                 found = list(filter(lambda todo: todo, MOCKED_DATA))
-
         for todo in found:
             MOCKED_DATA.remove(todo)
-
         return MOCKED_DATA
 
 
