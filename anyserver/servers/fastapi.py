@@ -145,8 +145,8 @@ class FastAPIServer(AbstractServer):
 
             # Return text if already encoded as string
             if type(data) == str:
-                ctype = None if not 'content-type' in resp.head else resp.head['content-type']
-                return fastapi.Response(content=data, media_type=ctype)
+                ctype = resp.head.get('content-type', None)
+                return fastapi.Response(content=data, media_type=ctype, headers=resp.head)
 
             return data
 
