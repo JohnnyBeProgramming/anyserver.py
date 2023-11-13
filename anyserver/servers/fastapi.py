@@ -117,17 +117,19 @@ class FastAPIServer(AbstractServer):
             TRACER.warn_no_reload()
             is_dev = False
 
-        # Mount the static path afetr all routes were registered
-        if static and os.path.isdir(static):
-            fileserver = fastapiStatic.StaticFiles(directory=static, html=True)
-            self.app.mount("/", fileserver, name="static")
-
         # Start the server using the target (request handler) type
         handle = self.app if not entrypoint else entrypoint
         uvicorn.run(handle, host=host, port=port, reload=is_dev)
 
     def static(self, path):
         self.config.static = path  # Will be loaded on start
+
+        # Mount the static path afetr all routes were registered
+        static = path
+        if static and os.path.isdir(static):
+            fileserver = fastapiStatic.StaticFiles(directory=static, html=True)
+            self.app.mount("/", fileserver, name="static")
+
 
     def bind(self, verb, route, action):
         # Register all routes with the current FastAPI server
