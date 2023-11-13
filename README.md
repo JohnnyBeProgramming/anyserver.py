@@ -15,13 +15,15 @@ async def root():
     return {"message": "Hello World"}
 ```
 
-What I don't like, is the _boilerplate_ and dependencies, for very simple use cases.
+What I don't like, for very simple use cases, is the _boilerplate_ and dependencies.
 
 All of the above frameworks have some requirements and dependencies, meaning its not completely portable to all environments, without the need to download dependencies from the internet.
 
-What I wanted was something that:
+At its core, this project was designed with the following features in mind:
 
-- A zero-dependency `server.py` that just works as a simple web server.
 - Handle `HTTP` routes with a simple `request` - `response` model.
-- Have a way to serve static content (HTML, CSS, JS) from a folder
+- Support ways to serve static content from a folder (eg: HTML, CSS, JS).
+- A zero-dependency `server.py` that just works out of the box as a simple web server.
+- Supports multiple response types, with ability to render custom templated responses.
 
+With these basic requirements in place, rapid prototyping is possible with very little overhead.
