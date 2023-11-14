@@ -2,7 +2,7 @@ import subprocess
 from distutils.core import setup
 
 name = 'anyserver'
-version = '0.3.3'
+version = '0.3.4'
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
